@@ -30,27 +30,33 @@ git clone https://github.com/david618/ansible
 
 Set hosts files.  One broker a41.
 
+```
 bash format-drives.sh
 bash install-kafka.sh
+```
+
 
 #### Install Spark
 
 Set hosts file. Master m1 and Worker a1.
 
+```
 bash format-drives.sh
 bash install-spark.sh
 
 bash start-spark.sh
+```
 
 #### Install Elasticsearch 7
 
 Set hosts file.  One node a101.
 
+```
 bash format-drives.sh
 bash install-elasticsearch.sh
 
 bash start-elasticsearch.sh
-
+```
 
 #### Deploy rttest to Test Servers
 
