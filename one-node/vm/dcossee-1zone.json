@@ -1,0 +1,1740 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+        {
+            "name": "[concat(resourceGroup().name,'boot')]",
+            "apiVersion": "2018-06-01",
+            "comments": "boot",
+            "dependsOn": [                
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name,'_','boot'))]"
+            ],
+            "type": "Microsoft.Compute/virtualMachines",
+			"scale": null,
+            "properties": {
+                "hardwareProfile": {
+                    "vmsize": "[parameters('bootServerSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "sku": "7.5",
+                        "publisher": "OpenLogic",
+                        "version": "latest",
+                        "offer": "CentOS"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "boot",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        },
+                        "diskSizeGB": 100         
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "adminUsername": "[parameters('username')]",
+                    "computerName": "boot",
+                    "linuxConfiguration": {
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('username'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('publicKey')]"
+                                }
+                            ]
+                        },
+                        "disablePasswordAuthentication": true
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name, '_', 'boot'))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name, '_', 'boot')]",
+            "apiVersion": "2018-02-01",
+            "comments": "boot",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_','boot'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name)]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name,'_','boot'))]"
+            ],
+            "type": "Microsoft.Network/networkInterfaces",
+            "properties": {
+                "enableIPForwarding": false,
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name), '/subnets/master')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_','boot'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name, '_', 'boot'))]"
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'boot')]",
+            "apiVersion": "2018-02-01",
+            "comments": "boot",
+            "dependsOn": [],
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },            
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"         
+        },
+        {
+            "name": "[concat(resourceGroup().name, 'm', copyIndex(1))]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "copy": {
+                "name": "numMasters",
+                "count": "[parameters('numMasters')]"
+            },
+            "apiVersion": "2018-06-01",
+            "comments": "[concat(resourceGroup().name, 'm', copyIndex(1))]",
+            "dependsOn": [
+				"[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name,'_m',copyIndex(1)))]"
+            ],
+			"scale": null,
+            "properties": {
+                "hardwareProfile": {
+                    "vmsize": "[parameters('masterSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "sku": "7.5",
+                        "publisher": "OpenLogic",
+                        "version": "latest",
+                        "offer": "CentOS"
+                    },
+                    "osDisk": {
+						"osType": "Linux",
+                        "name": "[concat('m', copyIndex(1))]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+							"storageAccountType": "Premium_LRS"
+                        },
+                        "diskSizeGB": 100  
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "adminUsername": "[parameters('username')]",
+                    "computerName": "[concat('m', copyIndex(1))]",
+                    "linuxConfiguration": {
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('username'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('publicKey')]"
+                                }
+                            ]
+                        },
+                        "disablePasswordAuthentication": true
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name, '_m', copyIndex(1)))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"            
+        },
+        {
+            "name": "[concat(resourceGroup().name, '_m', copyIndex(1))]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "copy": {
+                "name": "numMasters",
+                "count": "[parameters('numMasters')]"
+            },
+            "apiVersion": "2018-02-01",
+            "comments": "[concat(resourceGroup().name, 'm', copyIndex(1))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_m',copyIndex(1)))]",
+                "[resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master'))]",
+                "[resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name)]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name,'_','master'))]",
+				"[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_m',copyIndex(1)))]"
+            ],
+            "properties": {
+                "enableIPForwarding": false,
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name), '/subnets/master')]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master')),'/backendAddressPools/',resourceGroup().name,'_master','_pool')]"
+                                },
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/backendAddressPools/',resourceGroup().name,'_master_internal','_pool')]"                                    
+                                }                                
+                            ],
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_m',copyIndex(1)))]"
+                            }
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": true,                
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name, '_', 'master'))]"
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_m', copyIndex(1))]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },            
+            "copy": {
+                "name": "numMasters",
+                "count": "[parameters('numMasters')]"
+            },
+            "apiVersion": "2018-02-01",
+            "comments": "[concat(resourceGroup().name, 'm', copyIndex(1))]",
+            "dependsOn": [],
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"              
+        },
+        {
+            "name": "[concat(resourceGroup().name, 'a', copyIndex(1))]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "copy": {
+                "name": "numAgents",
+                "count": "[parameters('numAgents')]"
+            },
+            "apiVersion": "2018-06-01",
+            "comments": "[concat(resourceGroup().name, 'a', copyIndex(1))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name,'_a',copyIndex(1)))]",
+                "[resourceId('Microsoft.Compute/disks', concat(resourceGroup().name, '_a_data', copyIndex(1)))]"
+            ],
+			"scale": null,
+            "properties": {
+                "hardwareProfile": {
+                    "vmsize": "[parameters('agentSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "sku": "7.5",
+                        "publisher": "OpenLogic",
+                        "version": "latest",
+                        "offer": "CentOS"
+                    },
+                    "osDisk": {
+						"osType": "Linux",
+                        "name": "[concat(resourceGroup().name, 'a', copyIndex(1))]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+							"storageAccountType": "Premium_LRS"
+                        },
+                        "diskSizeGB": 100  
+                    },
+                    "dataDisks": [
+						{
+                            "lun": 1,
+                            "createOption": "Attach",
+                            "caching": "None",
+		                    "managedDisk": {
+		                        "id": "[resourceId('Microsoft.Compute/disks', concat(resourceGroup().name, '_a_data', copyIndex(1)))]"
+		                    }
+						}
+                    ]
+                },
+                "osProfile": {
+                    "adminUsername": "[parameters('username')]",
+                    "computerName": "[concat('a', copyIndex(1))]",
+                    "linuxConfiguration": {
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('username'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('publicKey')]"
+                                }
+                            ]
+                        },
+                        "disablePasswordAuthentication": true
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name, '_a', copyIndex(1)))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"              
+        },
+        {
+            "name": "[concat(resourceGroup().name, '_a_data', copyIndex(1))]",
+            "type": "Microsoft.Compute/disks",
+            "copy": {
+                "name": "numAgents",
+                "count": "[parameters('numAgents')]"
+            },          
+            "apiVersion": "2018-04-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[parameters('agentDiskSizeGB')]"
+            }               
+        },        
+        {
+            "name": "[concat(resourceGroup().name, '_a', copyIndex(1))]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "copy": {
+                "name": "numAgents",
+                "count": "[parameters('numAgents')]"
+            },
+            "apiVersion": "2018-02-01",
+            "comments": "[concat(resourceGroup().name, 'a', copyIndex(1))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name)]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name,'_','agent'))]"
+            ],
+            "properties": {
+                "enableIPForwarding": false,
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name), '/subnets/agent')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": true,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name, '_', 'agent'))]"
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name, 'p', copyIndex(1))]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "copy": {
+                "name": "numPublicAgents",
+                "count": "[parameters('numPublicAgents')]"
+            },
+            "apiVersion": "2018-06-01",
+            "comments": "[concat(resourceGroup().name, 'p', copyIndex(1))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name,'_p',copyIndex(1)))]"
+            ],
+			"scale": null,
+            "properties": {
+                "hardwareProfile": {
+                    "vmsize": "[parameters('publicAgentSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "sku": "7.5",
+                        "publisher": "OpenLogic",
+                        "version": "latest",
+                        "offer": "CentOS"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(resourceGroup().name, 'p', copyIndex(1))]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+							"storageAccountType": "Premium_LRS"
+                        },
+                        "diskSizeGB": 100  
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "adminUsername": "[parameters('username')]",
+                    "computerName": "[concat('p', copyIndex(1))]",
+                    "linuxConfiguration": {
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('username'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('publicKey')]"
+                                }
+                            ]
+                        },
+                        "disablePasswordAuthentication": true
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name, '_p', copyIndex(1)))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"              
+        },
+        {
+            "name": "[concat(resourceGroup().name, '_p', copyIndex(1))]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "copy": {
+                "name": "numPublicAgents",
+                "count": "[parameters('numPublicAgents')]"
+            },
+            "apiVersion": "2018-02-01",
+            "comments": "[concat(resourceGroup().name, 'p', copyIndex(1))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_p',copyIndex(1)))]",                
+                "[resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name)]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name,'_','agent_public'))]"
+            ],
+            "properties": {
+                "enableIPForwarding": false,
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name), '/subnets/agent_public')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_p',copyIndex(1)))]"
+                            },                            
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": true,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name, '_', 'agent_public'))]"
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_p', copyIndex(1))]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },            
+            "copy": {
+                "name": "numPublicAgents",
+                "count": "[parameters('numPublicAgents')]"
+            },
+            "apiVersion": "2018-02-01",
+            "comments": "[concat(resourceGroup().name, 'p', copyIndex(1))]",
+            "dependsOn": [],
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"           
+        },        
+        {
+            "name": "[concat(resourceGroup().name,'_', 'boot')]",
+            "apiVersion": "2018-02-01",
+            "comments": "boot",
+            "dependsOn": [],
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-ssh",
+                        "properties": {
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": "22",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "default-allow-https",
+                        "properties": {
+                            "priority": 1020,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": "443",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "default-allow-8080",
+                        "properties": {
+                            "priority": 1030,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": "8080",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "default-allow-9090",
+                        "properties": {
+                            "priority": 1040,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": "9090",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'master')]",
+            "apiVersion": "2018-02-01",
+            "comments": "master",
+            "dependsOn": [],
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-ssh",
+                        "properties": {
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": "22",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "default-allow-https",
+                        "properties": {
+                            "priority": 1020,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": "443",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','9090','_rule')]",
+                        "properties": {
+                            "priority": 1030,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 9090,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    }
+
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'agent')]",
+            "apiVersion": "2018-02-01",
+            "comments": "agent",
+            "dependsOn": [],
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-ssh",
+                        "properties": {
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": "22",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'agent_public')]",
+            "apiVersion": "2018-02-01",
+            "comments": "agent_public",
+            "dependsOn": [],
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-ssh",
+                        "properties": {
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": "22",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','80','_rule')]",
+                        "properties": {
+                            "priority": 1010,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 80,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','443','_rule')]",
+                        "properties": {
+                            "priority": 1020,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 443,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','9090','_rule')]",
+                        "properties": {
+                            "priority": 1030,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 9090,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10000','_rule')]",
+                        "properties": {
+                            "priority": 1040,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10000,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10001','_rule')]",
+                        "properties": {
+                            "priority": 1050,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10001,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10002','_rule')]",
+                        "properties": {
+                            "priority": 1060,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10002,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10003','_rule')]",
+                        "properties": {
+                            "priority": 1070,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10003,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10004','_rule')]",
+                        "properties": {
+                            "priority": 1080,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10004,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10005','_rule')]",
+                        "properties": {
+                            "priority": 1090,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10005,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10006','_rule')]",
+                        "properties": {
+                            "priority": 1100,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10006,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10007','_rule')]",
+                        "properties": {
+                            "priority": 1110,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10007,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10008','_rule')]",
+                        "properties": {
+                            "priority": 1120,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10008,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10009','_rule')]",
+                        "properties": {
+                            "priority": 1130,
+                            "direction": "Inbound",
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "destinationPortRange": 10009,
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'master')]",
+            "apiVersion": "2018-02-01",
+            "comments": "master",
+            "dependsOn": [],
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },            
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4,
+		"dnsSettings": {
+		    "domainNameLabel": "[concat(resourceGroup().name,'dcos')]"
+		}
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'agent_public')]",
+            "apiVersion": "2018-02-01",
+            "comments": "agent_public",
+            "dependsOn": [],
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },            
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4,
+                "dnsSettings": {
+                    "domainNameLabel": "[resourceGroup().name]"
+                }	
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+{
+            "name": "[concat(resourceGroup().name,'_', 'master')]",
+            "apiVersion": "2018-02-01",
+            "comments": "[resourceGroup().name]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_', 'master'))]"
+            ],
+            "type": "Microsoft.Network/loadBalancers",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },                        
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_', 'master','_1')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_', 'master'))]"
+                            }
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_p','80','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'master','_1')]"
+                            },
+                            "loadDistribution": "SourceIPProtocol",
+                            "backendPort": 80,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master')),'/probes/',resourceGroup().name,'_master_p','80','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master')),'/backendAddressPools/',resourceGroup().name,'_master','_pool')]"
+                            },
+                            "frontendPort": 80,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_p','443','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'master','_1')]"
+                            },
+                            "loadDistribution": "SourceIPProtocol",
+                            "backendPort": 443,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master')),'/probes/',resourceGroup().name,'_master_p','443','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master')),'/backendAddressPools/',resourceGroup().name,'_master','_pool')]"
+                            },
+                            "frontendPort": 443,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_master','_pool')]"
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_p','80','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 80
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_p','443','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 443
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'master_internal')]",
+            "apiVersion": "2018-02-01",
+            "comments": "[resourceGroup().name]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name)]"
+            ],
+            "type": "Microsoft.Network/loadBalancers",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },                        
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_', 'master_internal','_1')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "10.0.128.254",
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name), '/subnets/master')]"
+                            }
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','80','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'master_internal','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 80,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/probes/',resourceGroup().name,'_master_internal_p','80','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/backendAddressPools/',resourceGroup().name,'_master_internal','_pool')]"
+                            },
+                            "frontendPort": 80,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','443','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'master_internal','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 443,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/probes/',resourceGroup().name,'_master_internal_p','443','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/backendAddressPools/',resourceGroup().name,'_master_internal','_pool')]"
+                            },
+                            "frontendPort": 443,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },                                        
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','2181','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'master_internal','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 2181,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/probes/',resourceGroup().name,'_master_internal_p','2181','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/backendAddressPools/',resourceGroup().name,'_master_internal','_pool')]"
+                            },
+                            "frontendPort": 2181,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','5050','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'master_internal','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 5050,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/probes/',resourceGroup().name,'_master_internal_p','5050','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/backendAddressPools/',resourceGroup().name,'_master_internal','_pool')]"
+                            },
+                            "frontendPort": 5050,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','8080','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'master_internal','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 8080,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/probes/',resourceGroup().name,'_master_internal_p','8080','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/backendAddressPools/',resourceGroup().name,'_master_internal','_pool')]"
+                            },
+                            "frontendPort": 8080,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','8181','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'master_internal','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 8181,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/probes/',resourceGroup().name,'_master_internal_p','8181','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'master_internal')),'/backendAddressPools/',resourceGroup().name,'_master_internal','_pool')]"
+                            },
+                            "frontendPort": 8181,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal','_pool')]"
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','80','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 80
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','443','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 443
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','2181','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 2181
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','5050','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 5050
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','8080','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 8080
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_master_internal_p','8181','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 8181
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'agent_public')]",
+            "apiVersion": "2018-02-01",
+            "comments": "[resourceGroup().name]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_', 'agent_public'))]"
+            ],
+            "type": "Microsoft.Network/loadBalancers",
+             "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },           
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_', 'agent_public','_1')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_', 'agent_public'))]"
+                            }
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','80','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "SourceIPProtocol",
+                            "backendPort": 80,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','80','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 80,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','443','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "SourceIPProtocol",
+                            "backendPort": 443,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','443','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 443,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','9090','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 9090,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','9090','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 9090,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10000','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10000,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10000','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10000,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10001','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10001,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10001','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10001,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10002','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10002,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10002','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10002,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10003','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10003,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10003','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10003,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10004','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10004,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10004','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10004,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10005','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10005,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10005','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10005,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10006','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10006,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10006','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10006,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10007','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10007,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10007','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10007,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10008','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10008,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10008','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10008,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10009','_lbr')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/frontendIPConfigurations/',resourceGroup().name,'_', 'agent_public','_1')]"
+                            },
+                            "loadDistribution": "Default",
+                            "backendPort": 10009,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/probes/',resourceGroup().name,'_agent_public_p','10009','_probe')]"
+                            },
+                            "enableFloatingIP": false,
+                            "protocol": "Tcp",
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(resourceGroup().name,'_', 'agent_public')),'/backendAddressPools/',resourceGroup().name,'_agent_public','_pool')]"
+                            },
+                            "frontendPort": 10009,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public','_pool')]"
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','80','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 80
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','443','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 443
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','9090','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 9090
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10000','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10000
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10001','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10001
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10002','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10002
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10003','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10003
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10004','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10004
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10005','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10005
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10006','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10006
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10007','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10007
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10008','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10008
+                        }
+                    },
+                    {
+                        "name": "[concat(resourceGroup().name,'_agent_public_p','10009','_probe')]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "protocol": "Tcp",
+                            "port": 10009
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[resourceGroup().name]",
+            "apiVersion": "2018-02-01",
+            "comments": "[resourceGroup().name]",
+            "dependsOn": [],
+            "type": "Microsoft.Network/virtualNetworks",
+            "properties": {
+                "subnets": [
+                    {
+                        "name": "master",
+                        "properties": {
+                            "addressPrefix": "10.0.128.0/24"
+                        }
+                    },
+                    {
+                        "name": "agent",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/19"
+                        }
+                    },
+                    {
+                        "name": "agent_public",
+                        "properties": {
+                            "addressPrefix": "10.0.192.0/24"
+                        }
+                    }
+                ],
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        }
+    ],
+    "parameters": {
+        "username": {
+            "defaultValue": "azureuser",
+            "type": "String"
+        },
+        "publicKey": {
+            "defaultValue": null,
+            "type": "String"
+        },
+        "numMasters": {
+            "type": "int",
+            "defaultValue": 1,            
+            "allowedValues": [
+                1,
+                3,
+                5
+            ],
+            "metadata": {
+                "description": "Number of Masters"
+            }
+        },        
+        "masterSize": {
+            "type": "String",
+            "defaultValue": "Standard_D8s_v3",
+            "allowedValues": [
+                "Standard_D4s_v3",
+                "Standard_D8s_v3",
+                "Standard_D16s_v3",
+                "Standard_D32s_v3"
+            ],
+            "metadata": {
+                "description": "D4:4c/16r,D8:8c/32r,D16:16c/64r,D32:32c/128r"
+            }
+        },
+        "numAgents": {
+            "defaultValue": 6,
+            "type": "int",
+            "metadata": {
+                "description": "Number of Agents"
+            }
+        },
+        "agentSize": {
+            "type": "String",
+            "defaultValue": "Standard_D16s_v3",
+            "allowedValues": [
+                "Standard_D4s_v3",
+                "Standard_D8s_v3",
+                "Standard_D16s_v3",
+                "Standard_D32s_v3",
+                "Standard_D64s_v3"
+            ],
+            "metadata": {
+                "description": "D4:4c/16r,D8:8c/32r,D16:16c/64r,D32:32c/128r,D64:64c/256r"
+            }
+        },
+        "agentDiskSizeGB": {
+            "type": "int",
+            "defaultValue": 50,
+            "minValue": 10,
+            "maxValue": 4095,
+            "metadata": {
+                "description": "Additional Disk to add to each Agent in GB (10 to 4095)"
+            }
+        },
+        "numPublicAgents": {
+            "type": "int",
+            "defaultValue": 1,        
+            "metadata": {
+                "description": "Num of Public Agents"
+            }
+        },
+        "publicAgentSize": {
+            "type": "String",
+            "defaultValue": "Standard_D8s_v3",
+            "allowedValues": [
+                "Standard_D4s_v3",
+                "Standard_D8s_v3",
+                "Standard_D16s_v3",
+                "Standard_D32s_v3"            ],
+            "metadata": {
+                "description": "D4:4c/16r,D8:8c/32r,D16:16c/64r,D32:32c/128r"
+            }
+        },
+        "bootServerSize": {
+            "type": "String",
+            "defaultValue": "Standard_D2s_v3",
+            "allowedValues": [
+				"Standard_D2s_v3",
+                "Standard_D4s_v3"
+            ],
+            "metadata": {
+                "description": "D2:2c/8r,D4:4c/16r"
+            }
+        }
+    }
+}
