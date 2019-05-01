@@ -1,4 +1,9 @@
 # elastic-ingest
 
-Documents ingest testing done using Spark to load message from Kakfa to Elasticsearch.
+Documents ingest rates achieved using Spark to load message from Kakfa to Elasticsearch.
+
+## Using VM's on Azure
+
+
+## Using AKS 
 
