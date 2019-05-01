@@ -9,3 +9,7 @@ In these test one node was used for each component
 For both AKS and VM's these tests used D16v3 type instances.
 
 
+The ingest rates for both AKS and VM's were about the same.
+
+Ingest rage was about 80k/s at the start and dropped to 60k/s after about 15 minutes.
+
