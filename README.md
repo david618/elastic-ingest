@@ -7,6 +7,9 @@ Test Overview
 - Spark application consumes the Kafka Topic; reads the messages and writes them to Elasticsearch
 - Monitor tools are used to measure the rate at which messages are written to Kafka and Elasticsearch
 
+![Kafka Spark Elastic Diagram](./KafkaSparkElasticDiagram.jpg)
+
+
 ## Using VM's on Azure
 
 
