@@ -71,9 +71,11 @@ datastore-elasticsearch-client-headless 9200 - - 9 true false true planes 60s 10
 
 #### Pod Placement
 
-
+```
 kubectl get pods -o wide
+```
 
+```
 datastore-elasticsearch-client-0                                                          1/1     Running   0          8m57s   10.244.4.10   aks-nodepool1-64873208-7    <none>
 datastore-elasticsearch-client-1                                                          1/1     Running   0          8m57s   10.244.3.9    aks-nodepool1-64873208-8    <none>
 datastore-elasticsearch-client-2                                                          1/1     Running   0          8m57s   10.244.6.7    aks-nodepool1-64873208-6    <none>
@@ -101,6 +103,7 @@ rttest-send-0                                                                   
 rttest-send-1                                                                             1/1     Running   0          16m     10.244.11.5   aks-nodepool1-64873208-9    <none>
 rttest-send-2                                                                             1/1     Running   0          15m     10.244.10.8   aks-nodepool1-64873208-10   <none>
 sparktest-688c687f98-mt47h                                                                1/1     Running   0          19m     10.244.10.7   aks-nodepool1-64873208-10   <none>
+```
 
 The driver is using enough cpu on node 1 that the exec cannot start.
 
