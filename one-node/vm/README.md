@@ -9,8 +9,8 @@ Used [dcosee-1zone](../../install/vms/dcossee-1zone.json) template to create a c
 - 1 public agent (p1): test server  D16
 
 Used [add-agent template](../../install/vms/add-agents.json) to add additional nodes
-- 1 agent (a41): kafka
-- 1 agent (a101): elasticsearch
+- 1 agent (a41): kafka (D16 1TB drive)
+- 1 agent (a101): elasticsearch (D16 1TB drive)
 
 Total Cost: Based on Azure Cost Calculator $3,201.28/mo
 
