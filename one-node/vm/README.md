@@ -3,12 +3,12 @@
 
 Cluster named: dj0430k
 
-Used dcosee-1zone template to create a cluster
+Used [dcosee-1zone](../dcosee-1zone.json) template to create a cluster
 - 1 master (m1):  spark master  D8
 - 1 agent (a1): spark worker (with 1TB drive) D16
 - 1 public agent (p1): test server  D16
 
-Used add-agent template
+Used [add-agent template](../add-agent.json) to add additional nodes
 - 1 agent (a41): kafka
 - 1 agent (a101): elasticsearch
 
