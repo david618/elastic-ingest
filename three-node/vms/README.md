@@ -2,5 +2,5 @@
 
 These tests were done using 3 Elasticsearch nodes using Azure D16v3 VM's.
 
-- [05-04-2019](./05-04-2019): Exploring configuration for best performance
-- [05-06-2019](./05-06-2019): Repeat test
+- [05-03-2019](./05-03-2019): Exploring configuration for best performance. Rates as high as 144k/s using 3 VM's for Elasticsearch, Kafka, Spark, and test.  
+- [05-06-2019](./05-06-2019): Repeat test with 3 VM's for each function.  Rate was 190k/s for 80 million. Rate was still dropping so 190k/s does not appear to be sustainable.  
