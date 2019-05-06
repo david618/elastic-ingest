@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rttest-send-kafka-100k-5m
+spec:
+  selector:
+    matchLabels:
+      app: rttest-send-kafka-100k-5m
+  replicas: 10 
+  template:
+    metadata:
+      labels:
+        app: rttest-send-kafka-100k-5m
+    spec:
+      containers:
+      - name: rttest-send-kafka-100k-5m
+        image: david62243/rttest-send:v0.3
+        command: ["/bin/bash", "-c"]
+        #imagePullPolicy: Always
+        args: 
+          - >
+            cd /opt/rttest;
+            java -cp target/rttest.jar com.esri.rttest.send.Kafka gateway-cp-kafka-headless:9092 planes9 planes00000 200000 10000000;
+            tail -f /dev/null
+      nodeSelector:
+        func: test

@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rttest-send-kafka
+spec:
+  template:
+    spec:
+      containers:
+      - name: rttest-send-kafka
+        image: david62243/rttest-send:v0.3
+        command: ["/bin/bash", "-c"]
+        args: 
+          - >-
+            cd /opt/rttest;
+            java -cp target/rttest.jar com.esri.rttest.send.Kafka gateway-cp-kafka:9092 planes9 planes00000 100000 50000000
+        #imagePullPolicy: Always
+      restartPolicy: Never
+      nodeSelector:
+        func: test
+  backoffLimit: 2
+    

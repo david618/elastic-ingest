@@ -1,0 +1,11 @@
+description: Elasticsearch
+home: https://github.com/elastic/helm-charts
+maintainers:
+- email: helm-charts@elastic.co
+  name: Elastic
+name: elasticsearch
+version: 6.6.2-alpha1
+appVersion: 6.6.2
+sources:
+  - https://github.com/elastic/elasticsearch
+icon: https://helm.elastic.co/icons/elasticsearch.png

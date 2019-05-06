@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: sparktest
+spec:
+  selector:
+    matchLabels:
+      app: sparktest
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sparktest
+    spec:
+      #serviceAccountName: spark
+      containers:
+      - name: sparktest
+        image: david62243/sparktest:v0.4-2.3.2
+        command:
+           - sh
+           - -c
+           - "exec tail -f /dev/null"
+        imagePullPolicy: Always
+      #nodeSelector:
+      #  func: test
+      

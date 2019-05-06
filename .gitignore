@@ -1,0 +1,5 @@
+*.swp
+
+install/aks/azcli/tenants/*
+
+

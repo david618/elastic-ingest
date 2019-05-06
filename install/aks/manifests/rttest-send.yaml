@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rttest-send
+  labels:
+    app: rttest-send
+spec:
+  ports:
+  clusterIP: None
+  selector:
+    app: rttest-send
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rttest-send
+spec:
+  serviceName: rttest-send
+  selector:
+    matchLabels:
+      app: rttest-send
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: rttest-send
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: kubernetes.io/role
+                operator: In
+                values:
+                - agent
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: rttest-send
+        image: david62243/rttest-send:v0.3
+        command:
+          - sh
+          - -c
+          - "exec tail -f /dev/null"
+        imagePullPolicy: Always
+      nodeSelector:
+        func: test
+

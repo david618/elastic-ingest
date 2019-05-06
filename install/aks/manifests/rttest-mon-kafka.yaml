@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rttest-mon-kafka
+spec:
+  selector:
+    matchLabels:
+      app: rttest-mon-kafka
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rttest-mon-kafka
+    spec:
+      containers:
+      - name: rttest-mon-kafka
+        image: david62243/rttest-mon:v0.3
+        command: ["/bin/bash", "-c"]
+        imagePullPolicy: Always
+        args: 
+          - >
+            cd /opt/rttest;
+            java -cp target/rttest.jar com.esri.rttest.mon.KafkaTopicMon gateway-cp-kafka:9092 planes9
+      nodeSelector:
+        func: test

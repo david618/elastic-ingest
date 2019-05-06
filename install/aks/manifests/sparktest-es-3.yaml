@@ -1,0 +1,34 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sparktest-es
+spec:
+  selector:
+    matchLabels:
+      app: sparktest-es
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sparktest-es
+    spec:
+      containers:
+      - name: sparktest-es
+        image: david62243/sparktest:v0.4-2.3.2
+        command: ["/bin/bash", "-c"]
+        args:
+          - >
+             /opt/spark/bin/spark-submit \
+               --master k8s://https://kubernetes:443 \
+               --deploy-mode cluster \
+               --conf spark.executor.instances=9 \
+               --conf spark.streaming.kafka.consumer.cache.enabled=false \
+               --conf spark.kubernetes.container.image=david62243/sparktest:v0.4-2.3.2 \
+               --conf spark.kubernetes.container.forcePullImage=true \
+               --conf spark.kubernetes.driver.label.appname=sparktest-es \
+               --conf spark.kubernetes.executor.label.appname=sparktest-es \
+               --class org.jennings.estest.SendKafkaTopicElasticsearch local:///opt/spark/work-dir/sparktest-full.jar \
+               k8s://https://kubernetes:443 1000 gateway-cp-kafka:9092 group1 planes9 1 \
+               datastore-elasticsearch-client-headless 9200 - - 3 true false true planes 60s 10000 0 false
+        imagePullPolicy: Always
