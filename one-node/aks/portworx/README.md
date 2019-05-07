@@ -1,6 +1,6 @@
 #### Created AKS
 
-** 30 April 2019 **
+**30 April 2019**
 
 Create 4 node aks using D16sv3 nodes using the [install_aks.sh](../../install/aks/azcli/install-aks-10.sh)
 
