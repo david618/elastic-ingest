@@ -170,7 +170,7 @@ cd /opt/rttest
 bash sendPlanes gateway-cp-kafka:9092 planes9 planes00000 200 75 1
 ```
 
-#### Reults
+#### Results
 
 ##### KafkaTopicMon
 
