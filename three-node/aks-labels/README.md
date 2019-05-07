@@ -5,30 +5,38 @@ The VM version uses -Xmx1G -Xms1G for Kafka and -Xmx512M -Xms512M for zookeeper.
 
 values-label.yaml includes nodeSelector
 
+```
   nodeSelector:
     func: kafka
+```
 
-
+```
 helm install --values ../cp-helm-charts/values-label.yaml --name gateway ../cp-helm-charts
-
+```
 
 #### Test Components
+
+```
 nodeSelector:
   func: test
+```
 
+```
 kubectl apply -f rttest-send-label.yaml
 kubectl apply -f sparktest-label.yaml   
-
+```
 
 #### Datastore
 
-
+```
 nodeSelector:
   func: es
+```
 
+```
 helm install --values ../datastore/elasticsearch/master-values-label.yaml --name datastore-elasticsearch-master ../datastore/elasticsearch 
 helm install --values ../datastore/elasticsearch/client-values-label.yaml --name datastore-elasticsearch-client ../datastore/elasticsearch
-
+```
 
 ### Create Topic
 
