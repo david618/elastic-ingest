@@ -1,8 +1,10 @@
 #### Created AKS
 
-Create 4 node aks using D16sv3 nodes.
+Create 4 node aks using D16sv3 nodes using the [install_aks.sh](../../install/aks/azcli/install-aks-10.sh)
 
-bash install_aks.sh dj0430k westus2 16 4
+```
+bash install-aks-10.sh dj0507 westus2 16 4
+```
 
 #### Installed Portworx
 
