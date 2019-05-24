@@ -158,6 +158,6 @@ Detailed [ktm](./ktm3.txt) and [eim](./eim3.txt) outputs.
 Detailed [ktm](./ktm33.txt) and [eim](./eim33.txt) outputs.
 
 
-Observation:  It appears if you have many partitions (e.g. 33) the ingest rate is impacted. It starts off well and slowly drops. The test with 3 partitions provided a steady ingest rate for all 1 billion lines.
+Observation:  It appears if you have many partitions (e.g. 33) the ingest rate is impacted. It starts off well and slowly drops. The test with 3 partitions provided a steady ingest rate for all 1 billion lines. I've seen this dropoff in ingest rate for many of the tests I've done in past; just never connected that it was because of the number of partitions.
 
 
