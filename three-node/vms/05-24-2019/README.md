@@ -5,7 +5,7 @@
 
 ### Create Azure Cluster
 
-Created cluster with three agents using [create-cluster template](../install/vms/create-cluster.json)
+Created cluster with three agents using [create-cluster template](../../../install/vms/create-cluster.json)
 
 
 This created boot (D4sv3) and 3 nodes (D16vs3) a1,a2,a3 (Elasticsearch)
