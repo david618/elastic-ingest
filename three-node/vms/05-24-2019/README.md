@@ -10,7 +10,7 @@ Created cluster with three agents using [create-cluster template](../../../insta
 
 This created boot (D4sv3) and 3 nodes (D16vs3) a1,a2,a3 (Elasticsearch)
 
-Used add-agents template
+Used [add-agents template](../../../install/vms/add-agents.json)
 - added 3 nodes(D16sv3): a21,a22, and a23 (spark)
 - added 3 nodes(D16sv3): a41,a42, and a43 (kafka)
 - added 1 node (D16sv3): a81 (test)
