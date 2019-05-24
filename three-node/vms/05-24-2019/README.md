@@ -97,13 +97,15 @@ Kill from Spark Web UI or kill process.
 
 ### Kafka Topic Monitor (KTM)
 
-``
+```
 java -cp rttest/target/rttest.jar com.esri.rttest.mon.KafkaTopicMon a41:9092 planes3 > ktm3.txt &
 ```
 
 ### ElasticIndexMon (EIM)
 
+```
 java -cp rttest/target/rttest.jar com.esri.rttest.mon.ElasticIndexMon http://a1:9200/planes 10 6 > eim3.txt &
+```
 
 ### Send File to Kafka Topic
 
@@ -123,6 +125,7 @@ You can kill if needed using ``pkill -f send.Kafka``
 - KTM: 100k/s
 - EIM: 96k/s 
 
+Detailed [ktm](./ktm3.txt) and [eim](./eim3.txt) outputs.
 
 ### Repeated Kafka Topic with 33 Partitions
 
@@ -151,6 +154,9 @@ You can kill if needed using ``pkill -f send.Kafka``
 - Send: 4x25k/s (100k/s)
 - KTM: 100k/s
 - EIM: Started at 100k/s dropping slowly to 78k/s by end of run 
+
+Detailed [ktm](./ktm33.txt) and [eim](./eim33.txt) outputs.
+
 
 Observation:  It appears if you have many partitions (e.g. 33) the ingest rate is impacted. It starts off well and slowly drops. The test with 3 partitions provided a steady ingest rate for all 1 billion lines.
 
