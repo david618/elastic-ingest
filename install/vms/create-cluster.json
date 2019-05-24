@@ -1,0 +1,423 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+        {
+            "name": "[concat(resourceGroup().name,'boot')]",
+            "apiVersion": "2018-06-01",
+            "comments": "boot",
+            "dependsOn": [                
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name,'_','boot'))]"
+            ],
+            "type": "Microsoft.Compute/virtualMachines",
+			"scale": null,
+            "properties": {
+                "hardwareProfile": {
+                    "vmsize": "[parameters('bootServerSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "sku": "7.5",
+                        "publisher": "OpenLogic",
+                        "version": "latest",
+                        "offer": "CentOS"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "boot",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        },
+                        "diskSizeGB": 100         
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "adminUsername": "[parameters('username')]",
+                    "computerName": "boot",
+                    "linuxConfiguration": {
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('username'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('publicKey')]"
+                                }
+                            ]
+                        },
+                        "disablePasswordAuthentication": true
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name, '_', 'boot'))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name, '_', 'boot')]",
+            "apiVersion": "2018-02-01",
+            "comments": "boot",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_','boot'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name)]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name,'_','boot'))]"
+            ],
+            "type": "Microsoft.Network/networkInterfaces",
+            "properties": {
+                "enableIPForwarding": false,
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name), '/subnets/master')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(resourceGroup().name,'_','boot'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name, '_', 'boot'))]"
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'boot')]",
+            "apiVersion": "2018-02-01",
+            "comments": "boot",
+            "dependsOn": [],
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },            
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"         
+        },
+        {
+            "name": "[concat(resourceGroup().name, 'a', copyIndex(1))]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "copy": {
+                "name": "numAgents",
+                "count": "[parameters('numAgents')]"
+            },
+            "apiVersion": "2018-06-01",
+            "comments": "[concat(resourceGroup().name, 'a', copyIndex(1))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name,'_a',copyIndex(1)))]",
+                "[resourceId('Microsoft.Compute/disks', concat(resourceGroup().name, '_a_data', copyIndex(1)))]"
+            ],
+			"scale": null,
+            "properties": {
+                "hardwareProfile": {
+                    "vmsize": "[parameters('agentSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "sku": "7.5",
+                        "publisher": "OpenLogic",
+                        "version": "latest",
+                        "offer": "CentOS"
+                    },
+                    "osDisk": {
+						"osType": "Linux",
+                        "name": "[concat(resourceGroup().name, 'a', copyIndex(1))]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+							"storageAccountType": "Premium_LRS"
+                        },
+                        "diskSizeGB": 100  
+                    },
+                    "dataDisks": [
+						{
+                            "lun": 1,
+                            "createOption": "Attach",
+                            "caching": "None",
+		                    "managedDisk": {
+		                        "id": "[resourceId('Microsoft.Compute/disks', concat(resourceGroup().name, '_a_data', copyIndex(1)))]"
+		                    }
+						}
+                    ]
+                },
+                "osProfile": {
+                    "adminUsername": "[parameters('username')]",
+                    "computerName": "[concat('a', copyIndex(1))]",
+                    "linuxConfiguration": {
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('username'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('publicKey')]"
+                                }
+                            ]
+                        },
+                        "disablePasswordAuthentication": true
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(resourceGroup().name, '_a', copyIndex(1)))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"              
+        },
+        {
+            "name": "[concat(resourceGroup().name, '_a_data', copyIndex(1))]",
+            "type": "Microsoft.Compute/disks",
+            "copy": {
+                "name": "numAgents",
+                "count": "[parameters('numAgents')]"
+            },          
+            "apiVersion": "2018-04-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[parameters('agentDiskSizeGB')]"
+            }               
+        },        
+        {
+            "name": "[concat(resourceGroup().name, '_a', copyIndex(1))]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "copy": {
+                "name": "numAgents",
+                "count": "[parameters('numAgents')]"
+            },
+            "apiVersion": "2018-02-01",
+            "comments": "[concat(resourceGroup().name, 'a', copyIndex(1))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name)]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name,'_','agent'))]"
+            ],
+            "properties": {
+                "enableIPForwarding": false,
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', resourceGroup().name), '/subnets/agent')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": true,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(resourceGroup().name, '_', 'agent'))]"
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'boot')]",
+            "apiVersion": "2018-02-01",
+            "comments": "boot",
+            "dependsOn": [],
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-ssh",
+                        "properties": {
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "destinationPortRange": "22",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "default-allow-https",
+                        "properties": {
+                            "priority": 1020,
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "destinationPortRange": "443",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "default-allow-8080",
+                        "properties": {
+                            "priority": 1030,
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "destinationPortRange": "8080",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "default-allow-9090",
+                        "properties": {
+                            "priority": 1040,
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "destinationPortRange": "9090",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[concat(resourceGroup().name,'_', 'agent')]",
+            "apiVersion": "2018-02-01",
+            "comments": "agent",
+            "dependsOn": [],
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-ssh",
+                        "properties": {
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "destinationPortRange": "22",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*"
+                        }
+                    }
+                ]
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "name": "[resourceGroup().name]",
+            "apiVersion": "2018-02-01",
+            "comments": "[resourceGroup().name]",
+            "dependsOn": [],
+            "type": "Microsoft.Network/virtualNetworks",
+            "properties": {
+                "subnets": [
+                    {
+                        "name": "master",
+                        "properties": {
+                            "addressPrefix": "10.0.128.0/24"
+                        }
+                    },
+                    {
+                        "name": "agent",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/19"
+                        }
+                    },
+                    {
+                        "name": "agent_public",
+                        "properties": {
+                            "addressPrefix": "10.0.192.0/24"
+                        }
+                    }
+                ],
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                }
+            },
+            "resources": [],
+            "location": "[resourceGroup().location]"
+        }
+    ],
+    "parameters": {
+        "username": {
+            "defaultValue": "azureuser",
+            "type": "string"
+        },
+        "publicKey": {
+            "defaultValue": null,
+            "type": "string"
+        },
+        "numAgents": {
+            "defaultValue": 6,
+            "type": "int",
+            "metadata": {
+                "description": "Number of Agents"
+            }
+        },
+        "agentSize": {
+            "type": "string",
+            "defaultValue": "Standard_D16s_v3",
+            "allowedValues": [
+                "Standard_D4s_v3",
+                "Standard_D8s_v3",
+                "Standard_D16s_v3",
+                "Standard_D32s_v3",
+                "Standard_D64s_v3"
+            ],
+            "metadata": {
+                "description": "D4:4c/16r,D8:8c/32r,D16:16c/64r,D32:32c/128r,D64:64c/256r"
+            }
+        },
+        "agentDiskSizeGB": {
+            "type": "int",
+            "defaultValue": 50,
+            "minValue": 10,
+            "maxValue": 4095,
+            "metadata": {
+                "description": "Additional Disk to add to each Agent in GB (10 to 4095)"
+            }
+        },
+        "bootServerSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2s_v3",
+            "allowedValues": [
+				"Standard_D2s_v3",
+                "Standard_D4s_v3"
+            ],
+            "metadata": {
+                "description": "D2:2c/8r,D4:4c/16r"
+            }
+        }
+    }
+}
