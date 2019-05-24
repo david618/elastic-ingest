@@ -120,12 +120,24 @@ Creates output files for each instance (k1.out, k2.out, ...)
 
 You can kill if needed using ``pkill -f send.Kafka``
 
-
+Test 1
 - Send: 4x25k/s (100k/s)
 - KTM: 100k/s
 - EIM: 96k/s 
 
 Detailed [ktm](./ktm3.txt) and [eim](./eim3.txt) outputs.
+
+Test 2
+- Send 4x30k/s (120k/s)
+- KTM: 120k/s
+- EIM: 118k/s
+
+Test 3
+- Send 4x40k/s (160k/s)
+- KTM: 160k/s
+- EIM: 126k/s 
+
+
 
 ### Repeated Kafka Topic with 33 Partitions
 
