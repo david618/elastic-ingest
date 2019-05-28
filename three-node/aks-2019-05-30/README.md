@@ -1,4 +1,16 @@
 
+## Moving Components off AKS
+
+Goal is to try to isolate what is impacting performance.  
+
+- Everything on AKS:  50-60k/s
+- Elasticsearch off AKS: 60k/s
+- Elasticsearch and Kafka off AKS: 60k/s
+- Kakfa and Spark off AKS sending to ES on AKS: 80/s
+- Elasticsearch, Spark, and Kafka off AKS: 90k/s (Over 100k/s when given more Spark Executors)
+
+Spark on AKS seems to be contributing to the performance degradation. 
+
 ### Test Setup
 
 - AKS: 6 Nodes D16sv3
