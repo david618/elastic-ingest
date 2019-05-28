@@ -1,6 +1,4 @@
 
-
-
 ### Test Setup
 
 - AKS: 6 Nodes D16sv3
@@ -9,10 +7,17 @@
 
 ### Deploy Spark Job
 
-Using sparkop-2.4.1.yaml
+Using [sparkop-es-2.4.1.yaml](../../install/aks/manifests/sparkop-es-2.4.1.yaml)
 - drivers: 4 cores, 1024MB mem
 - exec: 4 cores, 5000MB mem, 3 instances
 
+### Deploy rttest-mon
+
+Use [rttest-mon.yaml](../../install/aks/manifests/rttest-mon.yaml)
+
+```
+kubectl apply -f rttest-mon.yaml
+```
 
 ### EIM Mon
 
@@ -36,19 +41,18 @@ java -cp target/rttest.jar com.esri.rttest.mon.KafkaTopicMon gateway-cp-kafka:90
 kubectl apply -f rttest-send-kafka-25k-10m.yaml
 ```
 
-Deployment configured to use four instances; expected total rate is 100k/s sending 40 million total messages.
+Deployment configured to use four instances; expected total rate is 100k/s, sending 40 million total messages.
 
 To restart: ```kubectl delete pod -l app=rttest-send-kafka-25k-10m```
 
 
 ### Results
 
-
 - KTM: 100k/s
 - EIM: 50k/s
 
 
-### Increasing Driver Cores from 4 to 8
+#### Increasing Driver Cores from 4 to 8
 
 Changes
 - drivers: 4 cores, 1024MB mem
@@ -59,9 +63,7 @@ Results
 - KTM: 100k/s
 - EIM: 56k/s
 
-Esrally was able to send at 90k/s to this same datastore configuration.  The 90k/s may be a limitation of Esrally not Datastore. 
-
-### Change External Elasticsearch
+#### Change External Elasticsearch
 
 Added three D16sv3 nodes to AKS Managed Cluster (outside of k8s); centos 7.5.
 
@@ -69,7 +71,9 @@ Installed Elasticsearch 7 using Ansible.
 
 Configure sparkop to use external es.
 
+```
 java -cp target/rttest.jar com.esri.rttest.mon.ElasticIndexMon http://10.240.0.10:9200/planes 10 6
+```
 
 This removes Elasticsearch from k8s.
 
@@ -82,7 +86,7 @@ Results:
 
 Added three more nodes (a41,a42, and a43); installed Kafka using Ansible (D16sv3)
 
-Modified SparkOp to use external kafka and external elasticsearch.
+Modified SparkOp Job to use external kafka and external elasticsearch.
 
 Created rttest-send-a41-25k-10m.yaml; sends to a41.
 
@@ -98,7 +102,6 @@ Added four more nodes
 - a21,a22, and a23: D16sv3 (Spark Data)
 - CentOS 7.5
 - Installed Spark using Ansible
-
 
 Compliled and deployed Sparktest to nodes
 
@@ -127,7 +130,6 @@ Same resources as Spark on AKS (3 instances each with 4 cores and 5000m of memor
 
 **NOTE:** Spark cannot access the Kafka on AKS. When connecting to Kafka; Kafka responses with IP's to brokers.  On AKS these IP's are internal; so clients external to AKS cannot connect.  It is possible to configure Kafka to be externally consumable; but haven't figured it out yet.
 
-
 Restarted sender on AKS. Sending at 100k/s.
 
 Results
@@ -135,14 +137,14 @@ Results
 - EIM: 87k/s
 
 
-Change Sending 8x25k/s
+##### Change Sending 8x25k/s
 
 Results
 - KTM: 200k/s
 - EIM: 100k/s
 
 
-Change SparkJob to use up to 24 cores (4 per executor) instead of 12.
+##### Change SparkJob to use up to 24 cores (4 per executor) instead of 12.
 
 Results
 - KTM: 200k/s
@@ -154,13 +156,13 @@ Results
 - EIM: 110k/s
 
 
-### Kafka External and Spark External 
+#### Kafka External and Spark External 
 
-Send to Elasticsearch on AKS.  
+Send to Elasticsearch on AKS.  Only Spark Job and Sender running on K8S.
 
-Create K8S service 
+Create K8S service for Elasticesearch; to allow access from other nodes in the resource group.
 
-
+```
 ---
 apiVersion: v1
 kind: Service
@@ -187,9 +189,11 @@ spec:
   - port: 9200
   selector:
     statefulset.kubernetes.io/pod-name: datastore-elasticsearch-client-1
+```
 
+Look up IP's; should be External IP as 10.240.0.x.  (e.g. kubectl get svc)
 
-Look up IP's; should be External IP as 10.240.0.x
+Run Spark Job on External Kafka.
 
 ```
 /opt/spark/bin/spark-submit   \
@@ -221,13 +225,13 @@ Results:
 
 **NOTE:** Datastore on AKS has two nodes and off AKS had 3.  
 
-Increased to 3 data nodes for AKS datastore.
+##### Increased to 3 data nodes for AKS datastore.
 
 Results:
 - KTM: 200k/s
 - EIM: 82k/s
 
-Sending to all three Elasticsearch Endpoints
+##### Sending to all three Elasticsearch Endpoints
 
 
 ```
