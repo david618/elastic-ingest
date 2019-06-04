@@ -112,6 +112,15 @@ subjects:
   namespace: kube-system
 ```
 
+### Install Helm
+
+```
+helm  init
+kubectl create serviceaccount --namespace kube-system tiller
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+```
+
 ### Portworx
 
 Looked at install docs for a few minutes; instructions for using cloud drives.  Requires IAM roles; etc.  Could do, but would require more time
