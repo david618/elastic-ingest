@@ -210,7 +210,7 @@ Longer test (200 million) started at near 180k/s after 20 minutes rate was down 
 ```
 eksctl get cluster --region us-east-2
 eksctl get nodegroup --cluster dj0603 --region us-east-2
-eksctl delete nodegroup --region us-east-2 --cluster dj0603 standard-workers
+eksctl delete cluster --region us-east-2 dj0603
 ```
 
 
