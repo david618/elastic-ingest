@@ -123,6 +123,7 @@ Removed Porworx references
 ```
 helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-master-values-nopx.yaml datastore-elasticsearch-master ../helm-charts/elastic/elasticsearch
 helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-client-values-nopx.yaml datastore-elasticsearch-client ../helm-charts/elastic/elasticsearch
+```
 
 ### Gateway
 
@@ -206,13 +207,11 @@ Longer test (200 million) started at near 180k/s after 20 minutes rate was down 
 
 ### Tear Down
 
+```
 eksctl get cluster --region us-east-2
-
-
 eksctl get nodegroup --cluster dj0603 --region us-east-2
-
 eksctl delete nodegroup --region us-east-2 --cluster dj0603 standard-workers
-
+```
 
 
 
