@@ -201,18 +201,23 @@ To restart: kubectl delete pod -l app=rttest-send-kafka-25k-10m
 
 ### Results
 
+### Two Data nodes using 14 cpu/50G mem (26GB heap) for each node
+
 EIM Rate: 126k/s
 
-Off k8s rate was 180k/s peak; long term rates of 140k/s.
+### Longer Test Sending 200 Million Planes Messages
 
-The best rates on AKS are 100k/s.  EKS is 30% faster than AKS; however, it's still 10 slower than off k8s.
+EIM Rate Started at 180k/s after 20 minutes rate as 128k/s.
 
-Longer test sending at 200k/s for 160 million; Average EIM Rate: 113k/s  
+### Five Data nodes using 14 cpu/50G mem (2GB heap) for each node
 
-Change Spark Job to 6 instances; Average EIM Rate: 180k/s.   This is on par with what we got off k8s.
+Sending at 4x25 (200k/s): EIM Rate was 198k/s
+Sending at 12x25 (300k/s): EIM Rate was 249k/s
 
-Longer test (200 million) started at near 180k/s after 20 minutes rate was down to 128k/s.   Finished with overal average EIM Rate of 123k/s.
+### Observations
 
+- Rates are much close to what we got off AKS; best rate no mater number of nodes on AKS was 100k/s
+- Rates also increased when additional data nodes were added
 
 ### Tear Down
 
