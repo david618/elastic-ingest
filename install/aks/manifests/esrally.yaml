@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: esrally
+spec:
+  selector:
+    matchLabels:
+      app: esrally
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: esrally
+    spec:
+      #serviceAccountName: spark
+      containers:
+      - name: esrally
+        image: david62243/esrally:v0.1
+        command:
+           - sh
+           - -c
+           - "exec tail -f /dev/null"
+        imagePullPolicy: Always
+      #nodeSelector:
+      #  func: test
+      

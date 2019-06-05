@@ -10,13 +10,13 @@ spec:
     - "1000"
     - "gateway-cp-kafka:9092"
     - "group1"
-    - "planes9"
+    - "planes3"
     - "1"
     - "datastore-elasticsearch-client-headless"
     - "9200"
     - "-"
     - "-"
-    - "3"
+    - "6"
     - "true"
     - "false"
     - "true"
@@ -35,12 +35,12 @@ spec:
     serviceAccount: spark
   executor:
     cores: 4
-    instances: 9
+    instances: 6
     javaOptions: -Dlog4j.configurationFile=/opt/spark/work-dir/log4j2conf.xml
     labels:
       version: 2.4.0
     memory: 5000m
-  image: "david62243/sparktest:v0.4-2.4.0"
+  image: "david62243/sparktest:v0.5-2.4.0"
   imagePullPolicy: Always
   mainApplicationFile: /opt/spark/work-dir/sparktest-full.jar
   mainClass: org.jennings.estest.SendKafkaTopicElasticsearch
@@ -51,7 +51,7 @@ spec:
     spark.driver.extraClassPath: "/opt/spark/work-dir/dependency-jars/\\*"
     spark.executor.extraClassPath: "/opt/spark/work-dir/dependency-jars/\\*"
     spark.kubernetes.container.forcePullImage: "true"
-    spark.kubernetes.container.image: david62243/sparktest:v0.4-2.4.0
+    spark.kubernetes.container.image: david62243/sparktest:v0.5-2.4.0
     spark.kubernetes.container.image.pullPolicy: Always
     spark.kubernetes.driver.label.app: kafka-to-elasticsearch
     spark.kubernetes.executor.label.app: kafka-to-elasticsearch

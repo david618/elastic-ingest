@@ -10,13 +10,13 @@ spec:
     - "1000"
     - "gateway-cp-kafka:9092"
     - "group1"
-    - "planes9"
+    - "planes5"
     - "1"
     - "datastore-elasticsearch-client-headless"
     - "9200"
     - "-"
     - "-"
-    - "3"
+    - "10"
     - "true"
     - "false"
     - "true"
@@ -26,7 +26,7 @@ spec:
     - "0"
     - "false"
   driver:
-    coreLimit: "4"
+    coreLimit: "2"
     cores: 2
     javaOptions: -Dlog4j.configurationFile=/opt/spark/work-dir/log4j2conf.xml
     labels:
@@ -35,7 +35,7 @@ spec:
     serviceAccount: spark
   executor:
     cores: 4
-    instances: 2
+    instances: 10 
     javaOptions: -Dlog4j.configurationFile=/opt/spark/work-dir/log4j2conf.xml
     labels:
       version: 2.4.1
@@ -57,7 +57,7 @@ spec:
     spark.kubernetes.executor.label.app: kafka-to-elasticsearch
     spark.locality.wait: 60s
     spark.scheduler.mode: FAIR
-    spark.streaming.concurrentJobs: "4"
+    spark.streaming.concurrentJobs: "64"
     spark.ui.enabled: "false"
     spark.ui.showConsoleProgress: "false"
     spark.streaming.kafka.consumer.cache.enabled: "false"

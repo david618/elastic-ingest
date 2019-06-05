@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: u18 
+spec:
+  selector:
+    matchLabels:
+      app: u18
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: u18
+    spec:
+      #serviceAccountName: spark
+      containers:
+      - name: u18
+        image: ubuntu:18.04
+        command:
+           - sh
+           - -c
+           - "exec tail -f /dev/null"
+        imagePullPolicy: Always
+      

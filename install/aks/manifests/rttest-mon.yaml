@@ -44,5 +44,5 @@ spec:
           - -c
           - "exec tail -f /dev/null"
         imagePullPolicy: Always
-      nodeSelector:
-        func: test
+      #nodeSelector:
+      #  func: test

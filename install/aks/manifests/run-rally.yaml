@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: run-rally
+spec:
+  containers:
+  - name: run-rally
+    image: david62243/esrally:v0.1
+    command: ["/bin/bash", "-c"]
+    args:
+       - >-
+           esrally configure 2>&1;
+           esrally --track=geonames --target-hosts=datastore-elasticsearch-headless:9200 --pipeline=benchmark-only --include-tasks="index-append" 2>&1;
+           tail -f /dev/null
+    imagePullPolicy: Always

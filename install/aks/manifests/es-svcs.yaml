@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: es-0
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 9200
+  selector:
+    statefulset.kubernetes.io/pod-name: datastore-elasticsearch-client-0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: es-1
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 9200
+  selector:
+    statefulset.kubernetes.io/pod-name: datastore-elasticsearch-client-1

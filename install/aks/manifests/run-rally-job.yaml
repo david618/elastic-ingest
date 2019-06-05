@@ -1,0 +1,22 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-rally
+spec:
+  template:
+    spec:
+      containers:
+      - name: run-rally
+        image: david62243/esrally:v0.1
+        command: ["/bin/bash", "-c"]
+        args:
+           - >-
+               esrally configure;
+               esrally --track=geonames --target-hosts=datastore-elasticsearch-headless:9200 --pipeline=benchmark-only --include-tasks="index-append"
+        imagePullPolicy: Always
+      #nodeSelector:
+      #  func: test
+      restartPolicy: Never
+  backoffLimit: 2
+      
