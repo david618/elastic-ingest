@@ -9,6 +9,22 @@ The performance on EKS about 30% faster than on AKS.
 
 Using 6 executors the peformance on EKS was close to same as off k8s.  Some tests were as high as 180k/s for three nodes.  Longer tests showed the rate drop over time; but still fairly close to rates off k8s.
 
+**10 Jun 19**
+
+Repeated test.
+
+Tried to use Portworx
+- Portworx Pods started
+- Portworx status looked good
+- K8s pvc's got stuck in pending
+
+Tested sending 300k/s  (12 x 25k/s)
+- Forgot to create Kafka Topic before running 2 and 3 node tests
+- 2 DS nodes: Average EIM 128k/s (one Kafka partition)
+- 3 DS nodes; Average EIM 132k/s (one Kafka partition)
+- 5 DS nodes; Average EIM 280k/s (five Kafka partitions)
+
+Ingest rates are very good.
 
 ### Created EKS using eksctl
 
