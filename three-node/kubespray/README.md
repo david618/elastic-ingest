@@ -1,5 +1,9 @@
 ### kubespray
 
+**7 Jun 19**
+
+Summary: Kubespray install on Azure gave similar results to AKS.  Adding additional datastore nodes did not improve ingest rates.  
+
 #### Create RG
 
 ```
