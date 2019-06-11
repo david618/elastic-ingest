@@ -40,9 +40,21 @@ Assumes you have az cli installed and you have logged in.
 
 #### Installing Requirements on Ubuntu 18.04
 
-**Optional:** This is only required if installing Ubuntu 18.04
+**Optional:** This is only required if installing Ubuntu 18.04.
 
-From my MAC centos install worked; however, install on Ubuntu 18.04 failed with error messages about yum, dnf, and dbus.
+Edit: ``/contrib/azurerm/roles/generate-templates/defaults/main.yml``
+
+Changed:
+
+```
+imageReference:
+  publisher: "Canonical"
+  offer: "UbuntuServer"
+  sku: "18.04-LTS"
+  version: "latest"
+  ```
+
+From my MAC; Centos install worked; however, install on Ubuntu 18.04 failed with error messages about yum, dnf, and dbus.
 
 Install worked if ran from master-0 (running Ubuntu 18.04).
 
@@ -53,7 +65,6 @@ sudo -y apt-get install python-pip
 ```
 sudo pip install -r requirements.txt
 ```
-
 
 
 #### Create Inventory
@@ -109,9 +120,9 @@ vi inventory/dj0610d/group_vars/k8s-cluster/k8s-cluster.yml
 
 Using Ubuntu 18.04; cilium driver installed.  Install was done from master-0.  
 
+To try different network settings; made a change to config and reran ansible playbook to deploy.
 
-Made a change to config and reran ansible playbook to deploy.
-
+None of these changes impacted the output.
 
 ```
 vi inventory/dj0610d/group_vars/all/all.yaml
@@ -188,16 +199,19 @@ kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"templat
 ```
 sudo yum -y install epel-release
 sudo yum -y install git
+```
 
+```
 git clone https://github.com/ArcGIS/trinity-operations
-
+```
 
 #### Create Storage Classes for Portworx
 
+```
 cd trinity-operations/devops/install
 
 kubectl apply -f portworx-storageclasses.yaml
-
+```
 
 #### Install Datastore
 
@@ -312,6 +326,14 @@ Average Ingest Rate EIM: 93k/s
 Using 3 node datastore; average ingest rate EIM: 103k/s
 
 Using 5 node datastore; average ingest rate EIM: 119k/s
+
+**10Jun19**
+
+Repeated test using Ubuntu.
+- 2 Node DS: Average EIM 74k/s
+- 3 Node DS: Average EIM: 77k/s
+- 5 Node DS: Average EIM: 78k/s
+
 
 #### Observations
 
