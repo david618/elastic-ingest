@@ -1,6 +1,8 @@
 
 ## AWS EKS Install
 
+**4 Jun 19**
+
 Deployed on M5.4xlarge (16 cores VM's similar to D16sv3 on Azure).
 
 The performance on EKS about 30% faster than on AKS.
