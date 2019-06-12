@@ -124,7 +124,7 @@ java -cp target/rttest.jar com.esri.rttest.mon.KafkaTopicMon gateway-cp-kafka:90
 Edited to make sure sending to planes3
 
 ```
-kubectl apply -f rttest-send-kafka-25k-15m.yaml
+kubectl apply -f rttest-send-kafka-25k-5m.yaml
 ```
 
 
