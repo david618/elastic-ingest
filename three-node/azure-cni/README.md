@@ -74,10 +74,11 @@ kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount
 
 ### Create Kafka Topics
 
+```
 kubectl exec -it gateway-cp-kafka-0 --container cp-kafka-broker bash
 kafka-topics --zookeeper gateway-cp-zookeeper:2181 --topic planes3 --create --replication-factor 1 --partitions 3
 kafka-topics --zookeeper gateway-cp-zookeeper:2181 --topic planes5 --create --replication-factor 1 --partitions 5
-
+```
 
 ### Deploy rttest-mon
 
