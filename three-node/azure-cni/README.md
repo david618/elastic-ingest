@@ -122,6 +122,14 @@ kubectl apply -f rttest-send-kafka-25k-5m.yaml
 ```
 
 
+### Chaning Number of Elasticsearch Nodes
+
+```
+kubectl edit statefulset datastore-elasticsearch-client
+```
+
+Change the number of replicas to the number of nodes you want to test.
+
 ### Results
 
 
