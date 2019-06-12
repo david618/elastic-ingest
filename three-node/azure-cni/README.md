@@ -8,7 +8,7 @@ Use Azure CNI instead of default kubenet plugin.
 From install/aks/azcli.
 
 ```
-azcli/install-aks-11.sh dj0612c
+azcli/install-aks-11.sh dj0612c westus2 16 9
 ```
 
 This will
