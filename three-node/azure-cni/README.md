@@ -5,20 +5,20 @@ Use Azure CNI instead of default kubenet plugin.
 
 ### Create Cluster
 
-Started tweaking install aks.
-
-azcli/install-aks-11.sh
+From install/aks/azcli.
 
 ```
-Manually created a vnet in resource group.
+azcli/install-aks-11.sh dj0612c
 ```
 
-To Do: Add code to script to create subnet.  
+This will
+- create resource group dj0612c
+- create virtual network in dj0612c
+- create aks in dj0612c
+
+Here's the snippet from the script that creates the AKS.
 
 ```
-SUBNETID=$(az network vnet subnet list --resource-group ${RG} --vnet-name ${RG} --query [].id --output tsv)
-echo ${SUBNETID}
-
 az aks create \
     --resource-group ${RG} \
     --name ${CLUSTER} \
@@ -42,12 +42,9 @@ Verfied that AKS networking was "Advanced/(Azure CNI)"
 - 2 Data Nodes and 3 Masters
 
 ```
-helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-master-values-nopx.yaml datastore-elasticsearch-master ../helm-charts/elastic/elasticsearch
+./install-datastore-es-20-nopx.sh dj0612c
 ```
 
-```
-helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-client-values-nopx.yaml datastore-elasticsearch-client ../helm-charts/elastic/elasticsearch
-```
 
 data nodes: 14 cpu and 50GB mem (26GB heap)
 
@@ -57,7 +54,7 @@ data nodes: 14 cpu and 50GB mem (26GB heap)
 - 3 brokers
 
 ```
-helm upgrade --wait --timeout=600 --install --values ../cp-helm-charts/values-prod-nopx.yaml gateway ../cp-helm-charts
+./install-gateway-kafka-30.sh dj0612c
 ```
 
 
@@ -65,10 +62,7 @@ helm upgrade --wait --timeout=600 --install --values ../cp-helm-charts/values-pr
 
 
 ```
-helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
-helm  install incubator/sparkoperator --namespace spark-operator --set enableWebhook=true
-kubectl create serviceaccount spark
-kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
+./install-sparkoperator-65.sh dj0612c
 ```
 
 
