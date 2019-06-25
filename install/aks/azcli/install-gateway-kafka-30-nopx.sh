@@ -32,7 +32,7 @@ done
 # Install Gateway
 echo "Installing Gateway"
 #helm --kubeconfig=${KC} install --name gateway ../cp-helm-charts
-helm --kubeconfig=${KC} upgrade --wait --timeout=600 --install --values ../cp-helm-charts/values-px.yaml gateway ../cp-helm-charts
+helm --kubeconfig=${KC} upgrade --wait --timeout=600 --install --values ../cp-helm-charts/values-nopx.yaml gateway ../cp-helm-charts
 
 echo "Started Gateway Install"
 

@@ -51,13 +51,24 @@ FILE=${TenantFolder}/install-portworx.yaml
 
 UUID=$(uuidgen | tr A-Z a-z)
 
-curl -o ${FILE} "https://install.portworx.com/?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key"
+curl -o ${FILE} "https://install.portworx.com/2.1?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key"
 
 kubectl --kubeconfig=${KC} apply -f ${FILE}
 
-kubectl --kubeconfig=${KC} apply -f ../portworx-storageclasses.yaml 
+# Create Service Principal (Required for Portworx 2.1 starting on 18 Jun 2019
 
-echo "Waiting for Portworx to Start; this can take another 10  minutes"
+RBAC=$(az ad sp create-for-rbac --role="Contributor" -n http://${RG} )
+APPID=$(echo $RBAC | jq .appId --raw-output)
+APPPW=$(echo $RBAC | jq .password --raw-output)
+TENID=$(echo $RBAC | jq .tenant --raw-output)
+
+kubectl --kubeconfig=${KC} create secret generic -n kube-system px-azure \
+  --from-literal=AZURE_TENANT_ID=${TENID} \
+  --from-literal=AZURE_CLIENT_ID=${APPID} \
+  --from-literal=AZURE_CLIENT_SECRET=${APPPW}
+
+
+echo "Waiting for Portworx to Start; this can take another 15  minutes"
 cnt=0
 ready=0
 while [ "$ready" -lt "${NUMNODES}" ];do
@@ -66,8 +77,8 @@ while [ "$ready" -lt "${NUMNODES}" ];do
   ready=$(kubectl --kubeconfig=${KC} get pods -n kube-system -l name=portworx -o custom-columns=ready:.status.containerStatuses[0].ready | grep true | wc -l)
   if [ "$ready" == null ];then ready=0; fi;
   echo $ready
-  if [ "$cnt" -gt 10 ];then
-    // After 10 minutes give up
+  if [ "$cnt" -gt 15 ];then
+    # After 15 minutes give up
     log_msg "Portworx is taking too long to start. Aborting install"
     exit 1
   fi

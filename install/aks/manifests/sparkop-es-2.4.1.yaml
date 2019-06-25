@@ -10,13 +10,13 @@ spec:
     - "1000"
     - "gateway-cp-kafka:9092"
     - "group1"
-    - "planes5"
+    - "planes3"
     - "1"
     - "datastore-elasticsearch-client-headless"
     - "9200"
     - "-"
     - "-"
-    - "10"
+    - "6"
     - "true"
     - "false"
     - "true"
@@ -35,7 +35,7 @@ spec:
     serviceAccount: spark
   executor:
     cores: 4
-    instances: 10 
+    instances: 6 
     javaOptions: -Dlog4j.configurationFile=/opt/spark/work-dir/log4j2conf.xml
     labels:
       version: 2.4.1

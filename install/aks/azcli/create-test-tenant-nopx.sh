@@ -63,24 +63,15 @@ if [ "$?" -ne 0 ];then
 	 exit 10
 fi	
 
-log_msg "Installing Portworx; this step can take up to 10 minutes"
-./install-portworx-15.sh ${RG} 1024 
-if [ "$?" -ne 0 ];then
-	 update_status "Create Failed" 
-	 exit 15
-fi	
-
-kubectl apply -f ../portworx-storageclasses.yaml
-
 log_msg "Installing Datastore"
-./install-datastore-es-20.sh ${RG} # mod
+./install-datastore-es-20-nopx.sh ${RG} # mod
 if [ "$?" -ne 0 ];then
 	 update_status "Create Failed" 
 	 exit 20
 fi	
 
 log_msg "Installing Gateway"
-./install-gateway-kafka-30.sh ${RG}
+./install-gateway-kafka-30-nopx.sh ${RG}
 if [ "$?" -ne 0 ];then
 	 update_status "Create Failed"
 	 exit 30

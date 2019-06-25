@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: rttest-send-kafka-25k-5m
-  replicas: 12
+  replicas: 8
   template:
     metadata:
       labels:
@@ -20,7 +20,7 @@ spec:
         args: 
           - >
             cd /opt/rttest;
-            java -cp target/rttest.jar com.esri.rttest.send.Kafka gateway-cp-kafka-headless:9092 planes5 planes00000 25000 5000000;
+            java -cp target/rttest.jar com.esri.rttest.send.Kafka gateway-cp-kafka-headless:9092 planes3 planes00000 25000 5000000;
             tail -f /dev/null
       #nodeSelector:
       #  func: test

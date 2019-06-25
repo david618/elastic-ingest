@@ -84,8 +84,13 @@ az group create --name ${RG} --location ${LOCATION}
 
 # Right now hard-coded root disk of 100G and K8S version 1.12.7 
 
-echo "Creating AKS"
+echo "Creating VNET"
+az network vnet create --name ${RG} --resource-group ${RG} --subnet-name default --address-prefix 10.0.0.0/8 --subnet-prefix 10.240.0.0/16  
 
+SUBNETID=$(az network vnet subnet list --resource-group ${RG} --vnet-name ${RG} --query [].id --output tsv)
+echo "Subnet id: ${SUBNETID}"
+
+echo "Creating AKS"
 start=$(date +'%s')
 az aks create \
     --resource-group ${RG} \
@@ -95,6 +100,11 @@ az aks create \
     --admin-username ${USER} \
     --ssh-key-value ${PUBKEY} \
     --node-osdisk-size 100 \
+		--network-plugin azure \
+		--vnet-subnet-id ${SUBNETID} \
+    --docker-bridge-address 172.17.0.1/16 \
+    --dns-service-ip 10.0.0.10 \
+    --service-cidr 10.0.0.0/16 \
     --kubernetes-version 1.12.7 
 echo "It took $(($(date +'%s') - $start)) seconds to create AKS"
 
