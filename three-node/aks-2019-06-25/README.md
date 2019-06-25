@@ -1,6 +1,6 @@
 ### Setup
 
-Installed A4IOT with 9 nodes
+Installed A4IOT with 6 nodes; scaled to 9 for 3 and 5 data node tests.
 
 Datastore data nodes configured with 14 cpu; 50GB mem, and heap configured at 26GB.
 
