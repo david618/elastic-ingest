@@ -196,5 +196,5 @@ Change number of replicas.
   - 62% gain going from 2 to 5 data nodes (gp2)
   
   
-
+**Note:** Portworx replication of 3 may be impacting the max ingest rate for Portworx. 
 
