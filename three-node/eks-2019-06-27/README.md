@@ -68,6 +68,8 @@ curl -fsL https://install.portworx.com/px-wipe | bash
 
 ### Set Key
 
+Wait until you have verified Portworx is up and running.
+
 ```
 PX_POD=$(kubectl get pods -l name=portworx -n kube-system -o jsonpath='{.items[0].metadata.name}')
 kubectl exec $PX_POD -n kube-system -- /opt/pwx/bin/pxctl secrets set-cluster-key --secret cluster-wide-secret-key
