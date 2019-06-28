@@ -37,9 +37,6 @@ kubectl -n portworx create secret generic px-vol-encryption --from-literal=clust
 
 ### Install Portworx
 
-```
-curl -fsL https://install.portworx.com/px-wipe | bash
-```
 
 https://install.portworx.com/
 
@@ -58,6 +55,16 @@ Verified that 6TB of Portworx capacity.
 ```
 /opt/pwx/bin/pxctl status
 ```
+
+### Uninstall Portworx
+
+If ever needed.
+
+```
+curl -fsL https://install.portworx.com/px-wipe | bash
+```
+
+
 
 ### Set Key
 
