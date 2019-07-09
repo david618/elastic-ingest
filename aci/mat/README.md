@@ -45,6 +45,8 @@ It also uses a "secret" volume to load the certificate for the server.
 
 These both had to be removed for the pod to start.
 
+Tested an generic secret and that works; failed with tls and docker secrets.
+
 #### Liveline and Rediness
 
 These are probablly ok; however, without the certificate the container readiness never become healthy; therefore, the container restarts over and over.
