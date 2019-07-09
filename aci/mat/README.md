@@ -49,4 +49,88 @@ These both had to be removed for the pod to start.
 
 These are probablly ok; however, without the certificate the container readiness never become healthy; therefore, the container restarts over and over.
 
+#### Modified Spec
 
+This spec worked.
+
+```
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: mat4
+    taskType: mat4
+  name: mat4
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mat4
+      taskType: mat4
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mat4
+        taskType: mat4
+    spec:
+      containers:
+      - env:
+        - name: ES_CLUSTER_NAME
+          value: A4IOTDataStore
+        - name: EXTERNAL_HOSTNAME
+          value: dj0709a-public.westus2.cloudapp.azure.com
+        - name: ES_USERNAME
+          value: elastic
+        - name: ES_PASSWORD
+          value: changeme
+        - name: ZK_QUORUM
+          value: gateway-cp-zookeeper:2181
+        - name: ES_TCP_PORT
+          value: "9300"
+        - name: SAT_GUID
+"mat4.yaml" 75L, 1913C
+          value: "9300"
+        - name: SAT_GUID
+          value: A4IOTDataStore
+        - name: ES_NODES
+          value: datastore-elasticsearch-client.default.svc
+        - name: ES_HTTP_PORT
+          value: "9200"
+        image: rtrujill007/realtime-mat:0.10.24_RT
+        imagePullPolicy: Always
+        name: mat4
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+        - containerPort: 9443
+          name: https
+          protocol: TCP
+        - containerPort: 8000
+          name: debug
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      nodeSelector:
+        kubernetes.io/role: agent
+        beta.kubernetes.io/os: linux
+        type: virtual-kubelet
+      tolerations:
+      - key: virtual-kubelet.io/provider
+        operator: Exists
+      - key: azure.com/aci
+        effect: NoSchedule
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+   ```
+   
