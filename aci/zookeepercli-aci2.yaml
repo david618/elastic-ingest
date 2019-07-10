@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeepercli-aci
+spec:
+  selector:
+    matchLabels:
+      app: zookeepercli-aci
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zookeepercli-aci
+    spec:
+      containers:
+      - name: zookeepercli-aci
+        image: david62243/zookeepercli:v0.1
+        command:
+           - sh
+           - -c
+           - "exec tail -f /dev/null"
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /tmp/mysecret
+          name: mysecretvol
+          readOnly: true
+        - mountPath: /tmp/a4iotcert
+          name: a4iotcertvol
+          readOnly: true          
+      nodeSelector:
+        kubernetes.io/role: agent
+        beta.kubernetes.io/os: linux
+        type: virtual-kubelet
+      tolerations:
+      - key: virtual-kubelet.io/provider
+        operator: Exists
+      - key: azure.com/aci
+        effect: NoSchedule
+      volumes:
+      - name: mysecretvol
+        secret:
+          defaultMode: 420
+          secretName: my-secret
+      - name: a4iotcertvol
+        secret:
+          defaultMode: 420
+          secretName: a4iot-cert          

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: david62243-spark-aci
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: david62243-spark-aci
+  template:
+    metadata:
+      labels:
+        app: david62243-spark-aci
+    spec:
+      containers:
+      - name: david62243-spark-aci
+        image: david62243/spark:2.4.3
+        command:
+        - sh
+        - -c
+        - "exec tail -f /dev/null"
+      nodeSelector:
+        kubernetes.io/role: agent
+        beta.kubernetes.io/os: linux
+        type: virtual-kubelet
+      tolerations:
+      - key: virtual-kubelet.io/provider
+        operator: Exists
+      - key: azure.com/aci
+        effect: NoSchedule

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: david62243-spark
+  namespace: default
+spec:
+  containers:
+  - name: david62243-spark
+    image: david62243/spark:2.4.3
+    command:
+    - sh
+    - -c
+    - "exec tail -f /dev/null"
+

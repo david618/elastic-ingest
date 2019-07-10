@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: david62243-spark2
+  namespace: default
+spec:
+  containers:
+  - name: david62243-spark2
+    image: david62243/spark:2.4.3
+    command: ["/bin/bash", "-c"]
+    args: 
+      - >
+        /opt/spark/bin/spark-submit \
+          --master k8s://https://kubernetes.default.svc.cluster.local:443 \
+          --deploy-mode cluster \
+          --name spark-pi \
+          --class org.apache.spark.examples.SparkPi \
+          --conf spark.executor.instances=3 \
+          --conf spark.kubernetes.container.image=david62243/spark:2.4.3 \
+          local:///opt/spark/examples/jars/spark-examples_2.11-2.4.3.jar; \
+          tail -f /dev/null
+
