@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ss
+  labels:
+    app: nginx-ss
+spec:
+  ports:
+  clusterIP: None
+  selector:
+    app: nginx-ss
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nginx-ss
+spec:
+  serviceName: nginx-ss
+  selector:
+    matchLabels:
+      app: nginx-ss
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-ss
+    spec:
+      containers:
+      - env:
+        - name: network.host
+          value: 0.0.0.0
+        name: nginx-ss
+        image: nginx
+        command:
+        - sh
+        - -c
+        - "exec tail -f /dev/null"
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /opt/nginx
+          name: nginx-data
+  volumeClaimTemplates:
+  - metadata:
+      name: nginx-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      dataSource: null
+      resources:
+        requests:
+          storage: 50Gi
+      storageClassName: eks-exp

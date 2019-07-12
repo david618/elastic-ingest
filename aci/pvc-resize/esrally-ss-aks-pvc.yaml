@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: esrally-ss
+  labels:
+    app: esrally-ss
+spec:
+  ports:
+  clusterIP: None
+  selector:
+    app: esrally-ss
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: esrally-ss
+spec:
+  serviceName: esrally-ss
+  selector:
+    matchLabels:
+      app: esrally-ss
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: esrally-ss
+    spec:
+      containers:
+      - env:
+        - name: network.host
+          value: 0.0.0.0
+        name: esrally-ss
+        image: david62243/esrally:v0.1
+        command:
+        - sh
+        - -c
+        - "exec tail -f /dev/null"
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /opt/rally
+          name: rally-data
+  volumeClaimTemplates:
+  - metadata:
+      name: rally-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      dataSource: null
+      resources:
+        requests:
+          storage: 50Gi
+      storageClassName: managed-premium
