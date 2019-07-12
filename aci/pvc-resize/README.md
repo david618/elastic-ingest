@@ -1,5 +1,7 @@
 ## Dynamically Resize PVC
 
+Reference in Azure Docs: https://docs.microsoft.com/en-us/azure/aks/azure-disks-dynamic-pv
+
 ### Added allowVolumeExpansion 
 
 Used ``kubectl edit pvc managed-premium`` and added line ``allowVolumeExpansion: true``
