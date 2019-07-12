@@ -192,13 +192,15 @@ You should see a KafkaTopicMon rate of around 200k/s.
 
 #### Collect Results Elastic Index Mon
 
-The following table reports Average Rates
+The following table reports Average Rates.  The test was repeated three times with same send rate.
 
 |KTM Rate|EIM Rate|Number Msgs Sent|Number Msgs Ingested|
 |--------|--------|----------------|--------------------|
 |392 k/s |311 k/s |40 million      |40 million          |
 |398 k/s |215 k/s |160 million     |160 million         |
 |401 k/s |241 k/s |160 million     |160 million         |
+
+**Note:** With longer test runs the rates appear to slow down; which, was seen on other ingest tests.
 
 #### Observations
 - When testing on Azure with more VM's and separation of tasks (Kafka, Spark, Elasticsearch) rates achieved were higher
