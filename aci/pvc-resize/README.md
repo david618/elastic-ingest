@@ -45,5 +45,29 @@ Tried restarting the Pod.  Still didn't resize.
 
 Added same parameter to Portworx Stroage Class and resize works fine.
 
+### EKS 
+
+Created a Storage Class
+
+```
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: eks-exp
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+```
+
+Edited the PVC and resized.  
+
+Describe of the pvc; said it was waiting for pod to "(re)start" to apply the resize.
+
+Deleted the pod and upon restart the PVC resized.
+
+
 
 
