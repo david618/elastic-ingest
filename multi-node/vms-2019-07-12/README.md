@@ -208,6 +208,5 @@ The following table reports Average Rates
   - 1 Test VM
   - Ingest rate was 466k/s  
   - Ingest rate was nearly 2x faster than test above; however, this required 24 VM's instead of 14.
-
-
+- EKS with 14 M5.4xlarge gave ingest rates of 506k/s [EKS](https://github.com/david618/elastic-ingest/tree/master/multi-node/eks-2019-06-28)
 
