@@ -43,7 +43,13 @@ Tried restarting the Pod.  Still didn't resize.
 
 ### Using Portworx
 
-Added same parameter to Portworx Stroage Class and resize works fine.
+Added ``allowVolumeExpansion`` parameter to Portworx Stroage Class.
+
+Edited the PVC and resized.
+
+Within a few seconds the PVC showed the new size; no restart was required.
+
+
 
 ### EKS 
 
