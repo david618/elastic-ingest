@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: rttest-send-kafka-25k-5m
-        image: david62243/rttest-send:v0.3
+        image: david62243/rttest-send:20190718
         command: ["/bin/bash", "-c"]
         #imagePullPolicy: Always
         args: 

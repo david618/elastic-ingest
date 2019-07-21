@@ -3,10 +3,10 @@
 set -e
 
 if [ "$#" -lt 1 ];then
-  echo "Usage: $0 [ResourceGroupName] (Location=eastus2) (cores-per-node=16) (number-nodes=6)"
+  echo "Usage: $0 [ResourceGroupName] (Location=eastus2) (cores-per-node=16) (number-nodes=3)"
   echo
   echo "Example: $0 dj0218"
-  echo "This will create the resource group dj0218 and AKS dj0218-cluster, in eastus2, creating 6 nodes with 16 cores each."
+  echo "This will create the resource group dj0218 and AKS dj0218-cluster, in eastus2, creating 3 nodes with 16 cores each."
   echo
   echo "Example: $0 dj0218 westus2 32 12"
   echo "This will create the resource group dj0218 and AKS dj0218-cluster, in westus2, creating 12 nodes with 32 cores each."
@@ -20,8 +20,6 @@ if [ $? -ne 0 ];then
   echo 'You need to login first. Run "az login"'
   exit 5 
 fi
-
-# We could use a parameter based on tenant (small, standard, large)
 
 RG=$1
 CLUSTER=${RG}-cluster
@@ -45,7 +43,7 @@ fi
 
 SIZE=Standard_D${CORES}s_v3
 
-COUNT=6
+COUNT=3
 if [ "$#" -ge 4 ];then
   COUNT=$4
 fi

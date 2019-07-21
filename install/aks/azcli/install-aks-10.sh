@@ -3,17 +3,16 @@
 set -e
 
 if [ "$#" -lt 1 ];then
-  echo "Usage: $0 [ResourceGroupName] (Location=eastus2) (cores-per-node=16) (number-nodes=6)"
+  echo "Usage: $0 [ResourceGroupName] (Location=eastus2) (cores-per-node=16) (number-nodes=3)"
   echo
   echo "Example: $0 dj0218"
-  echo "This will create the resource group dj0218 and AKS dj0218-cluster, in eastus2, creating 6 nodes with 16 cores each."
+  echo "This will create the resource group dj0218 and AKS dj0218-cluster, in eastus2, creating 3 nodes with 16 cores each."
   echo
   echo "Example: $0 dj0218 westus2 32 12"
   echo "This will create the resource group dj0218 and AKS dj0218-cluster, in westus2, creating 12 nodes with 32 cores each."
   echo
   exit 4 
 fi
-
 
 az vm list -o table > /dev/null 2>&1
 if [ $? -ne 0 ];then
@@ -45,7 +44,7 @@ fi
 
 SIZE=Standard_D${CORES}s_v3
 
-COUNT=6
+COUNT=3
 if [ "$#" -ge 4 ];then
   COUNT=$4
 fi
@@ -59,6 +58,8 @@ echo "COUNT: ${COUNT}"
 # Creates KC
 . ./support.sh ${RG}
 
+#az account set --subscription ${SID}
+
 update_url ""
 update_a4iot_build ""
 
@@ -68,8 +69,8 @@ USER=azureuser
 PUBKEY=az.pub
 
 # Check cores available
-DSV3USED=$(az vm list-usage --location ${LOCATION} -o tsv |  awk -F'\t' '/DSv3/ {print $1}')
-DSV3LIMIT=$(az vm list-usage --location ${LOCATION} -o tsv |  awk -F'\t' '/DSv3/ {print $2}')
+DSV3USED=$(az vm list-usage --subscription ${SID} --location ${LOCATION} -o tsv |  awk -F'\t' '/DSv3/ {print $1}')
+DSV3LIMIT=$(az vm list-usage --subscription ${SID} --location ${LOCATION} -o tsv |  awk -F'\t' '/DSv3/ {print $2}')
 DSV3AVAIL=$((${DSV3LIMIT}-${DSV3USED}))
 
 CORESREQ=$((${CORES}*${COUNT}))
@@ -80,14 +81,17 @@ if [ "${CORESREQ}" -gt "${DSV3AVAIL}" ]; then
 fi
   
 echo "Creating Resource Group"
-az group create --name ${RG} --location ${LOCATION}
+az group create --subscription ${SID} --name ${RG} --location ${LOCATION}
 
 # Right now hard-coded root disk of 100G and K8S version 1.12.7 
 
 echo "Creating AKS"
 
+#    --enable-addons monitoring \
+
 start=$(date +'%s')
 az aks create \
+		--subscription ${SID} \
     --resource-group ${RG} \
     --name ${CLUSTER} \
     --node-count ${COUNT} \
@@ -95,19 +99,19 @@ az aks create \
     --admin-username ${USER} \
     --ssh-key-value ${PUBKEY} \
     --node-osdisk-size 100 \
-    --kubernetes-version 1.12.7 
+    --kubernetes-version 1.12.8 
 echo "It took $(($(date +'%s') - $start)) seconds to create AKS"
 
 echo "Getting AKS Credentials"
 
-az aks get-credentials --resource-group ${RG} --name ${CLUSTER} --overwrite-existing -f ${KC}
-az aks get-credentials --resource-group ${RG} --name ${CLUSTER} --overwrite-existing 
+az aks get-credentials --subscription ${SID} --resource-group ${RG} --name ${CLUSTER} --overwrite-existing -f ${KC}
+az aks get-credentials --subscription ${SID} --resource-group ${RG} --name ${CLUSTER} --overwrite-existing 
 
 # Dashboard Access
 echo "Setting service account to allow access to K8s Dashboard"
 kubectl --kubeconfig=${KC} create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
 
-echo "You can now access dashboard using command: az aks browse --resource-group ${RG} --name ${CLUSTER}"
+echo "You can now access dashboard using command: az aks browse --subscription ${SID} --resource-group ${RG} --name ${CLUSTER}"
 
 # Helm
 echo "Initializing Helm"

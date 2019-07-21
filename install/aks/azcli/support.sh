@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
+if [ ! -f ./svcprins ]; then
+    echo "You need to create svcprins file; use svcprins.template updating inputs as needed"
+fi
+
+. ./svcprins
+
 TenantFolder=tenants/${1}
 mkdir -p ${TenantFolder}
 
-KC=${TenantFolder}/kubeconfig
+export KC=${TenantFolder}/kubeconfig
 
 log_msg() {
 	 MSG=$1

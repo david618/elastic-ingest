@@ -31,7 +31,7 @@ done
 echo "Installing Spark Operator"
 
 helm --kubeconfig=${KC} repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
-helm --kubeconfig=${KC} install incubator/sparkoperator --namespace spark-operator --set enableWebhook=true
+helm --kubeconfig=${KC} install incubator/sparkoperator --name spark --namespace spark-operator --set enableWebhook=true
 
 # Apply RBAC for Spark Operator
 kubectl --kubeconfig=${KC} create serviceaccount spark

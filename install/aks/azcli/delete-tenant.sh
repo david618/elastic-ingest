@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 if [ "$#" -ne 1 ];then
   echo "Usage: $0 [ResourceGroupName]"
   echo "Example: $0 dj0218"
@@ -24,13 +22,24 @@ update_status "Deleting Tenant"
 log_msg "Deleting AKS. This can take 10 minutes."
 
 az aks delete \
+	  --subscription ${SID} \
     --name ${CLUSTER} \
     --resource-group ${RG} \
     --yes 
 
 log_msg "Deleting the Resource Group"
 
-az group delete --name ${RG} --yes
+az group delete --subscription ${SID} --name ${RG} --yes
+
+log_msg "Deleting Service Principal"
+
+# Delete Service Principal; Subscription ID (SID) comes from support.sh
+APPID=$(az ad sp list --subscription ${SID} --display-name ${RG} | jq --raw-output '.[0].appId')
+az ad sp delete --id ${APPID} --subscription ${SID}
+
+if [ "$?" -ne 0 ]; then
+  log_msg "Service Principal Delete failed; this is expected, if you were not the person who created the tenant. "
+fi
 
 echo "Delete completed. It took $(($(date +'%s') - $start)) seconds"
 log_msg "Delete Completed"

@@ -3,13 +3,14 @@
 set -e
 
 if [ "$#" -lt 1 ];then
-  echo "Usage: $0 [ResourceGroupName]"
+  echo "Usage: $0 [ResourceGroupName] [Dev=yes/no]"
   exit 4 
 fi
 
 # We could use a parameter based on tenant (small, standard, large)
 
 RG=$1
+DEV=$2
 
 . ./support.sh ${RG}
 
@@ -31,8 +32,11 @@ done
 
 # Install Gateway
 echo "Installing Gateway"
-#helm --kubeconfig=${KC} install --name gateway ../cp-helm-charts
-helm --kubeconfig=${KC} upgrade --wait --timeout=600 --install --values ../cp-helm-charts/values-px.yaml gateway ../cp-helm-charts
-
+#helm --kubeconfig=${KC} install --name gateway ../helm-charts/confluent
+if [ ${DEV} == "yes" ]; then
+  helm --kubeconfig=${KC} upgrade --wait --timeout=600 --install --values ../helm-charts/confluent/values-dev.yaml gateway ../helm-charts/confluent
+else
+  helm --kubeconfig=${KC} upgrade --wait --timeout=600 --install --values ../helm-charts/confluent/values-prod.yaml gateway ../helm-charts/confluent
+fi
 echo "Started Gateway Install"
 

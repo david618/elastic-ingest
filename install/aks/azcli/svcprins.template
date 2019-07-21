@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Make a copy of this file and fill in data 
+# cp svcprins.template svcprins
+
+# Subscriptiont ID
+export SID="REPLACE WITH YOUR SUBSCRIPTION ID"
+
+# ACI Requires a Service Principal to be created
+
+#az ad sp create-for-rbac --skip-assignment --name sp-aci
+
+export APPID="INSERT APPID FROM COMMAND ABOVE HERE"
+export APPPW="INSERT PASSWORD FROM COMMAND ABOVE HERE"

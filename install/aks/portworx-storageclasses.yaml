@@ -3,6 +3,7 @@ apiVersion: storage.k8s.io/v1beta1
 metadata:
   name: portworx-db-sc
 provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
 parameters:
   repl: "3"
   io_profile: "db"
@@ -12,6 +13,7 @@ apiVersion: storage.k8s.io/v1beta1
 metadata:
   name: portworx-db2-sc
 provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
 parameters:
    repl: "3"
    block_size: "512b"
@@ -22,6 +24,7 @@ apiVersion: storage.k8s.io/v1beta1
 metadata:
   name: portworx-shared-sc
 provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
 parameters:
    repl: "3"
    shared: "true"
@@ -31,6 +34,7 @@ apiVersion: storage.k8s.io/v1beta1
 metadata:
  name: px-db-rf2-sc
 provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
 parameters:
  repl: "2"
  priority_io: "high"
@@ -40,8 +44,77 @@ parameters:
 kind: StorageClass
 apiVersion: storage.k8s.io/v1beta1
 metadata:
+ name: px-db-rf1-sc
+provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
+parameters:
+ repl: "1"
+ priority_io: "high"
+ io_profile: "db"
+ disable_io_profile_protection: "1"
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+ name: px-db-rf1-secure-sc
+provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
+parameters:
+ repl: "1"
+ priority_io: "high"
+ io_profile: "db"
+ secure: "true"
+ disable_io_profile_protection: "1"
+ snapshotschedule.stork.libopenstorage.org/default-schedule: |
+   schedulePolicyName: a4iot-prod
+   annotations:
+     portworx/snapshot-type: local
+ snapshotschedule.stork.libopenstorage.org/weekly-schedule: |
+   schedulePolicyName: a4iot-prod
+   annotations:
+     portworx/snapshot-type: cloud
+     portworx/cloud-cred-id: REPLACE_WITH_CREDENTIAL_UUID
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+ name: px-db-rf2-sc
+provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
+parameters:
+ repl: "2"
+ priority_io: "high"
+ io_profile: "db"
+ disable_io_profile_protection: "1"
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+ name: px-db-rf2-secure-sc
+provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
+parameters:
+ repl: "2"
+ priority_io: "high"
+ io_profile: "db"
+ secure: "true"
+ disable_io_profile_protection: "1"
+ snapshotschedule.stork.libopenstorage.org/default-schedule: |
+   schedulePolicyName: a4iot-prod
+   annotations:
+     portworx/snapshot-type: local
+ snapshotschedule.stork.libopenstorage.org/weekly-schedule: |
+   schedulePolicyName: a4iot-prod
+   annotations:
+     portworx/snapshot-type: cloud
+     portworx/cloud-cred-id: REPLACE_WITH_CREDENTIAL_UUID
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
  name: px-db-rf3-sc
 provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
 parameters:
  repl: "3"
  priority_io: "high"
@@ -53,12 +126,22 @@ apiVersion: storage.k8s.io/v1beta1
 metadata:
  name: px-db-rf3-secure-sc
 provisioner: kubernetes.io/portworx-volume
+allowVolumeExpansion: true
 parameters:
  repl: "3"
  priority_io: "high"
  io_profile: "db"
  secure: "true"
  disable_io_profile_protection: "1"
+ snapshotschedule.stork.libopenstorage.org/default-schedule: |
+   schedulePolicyName: a4iot-prod
+   annotations:
+     portworx/snapshot-type: local
+ snapshotschedule.stork.libopenstorage.org/weekly-schedule: |
+   schedulePolicyName: a4iot-prod
+   annotations:
+     portworx/snapshot-type: cloud
+     portworx/cloud-cred-id: REPLACE_WITH_CREDENTIAL_UUID
 ---
 
 #
@@ -89,3 +172,13 @@ metadata:
        params/journal:         "Flag to indicate if you want to use journal device for the volume's metadata. This will use the journal device that you used when installing Portworx. As of PX version 1.3, it is recommended to use a journal device to absorb PX metadata writes"
 provisioner: kubernetes.io/portworx-volume
 parameters:
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: portworx-spark-sc
+provisioner: kubernetes.io/portworx-volume
+parameters:
+  repl: "3"
+  shared: "true"
+allowVolumeExpansion: true

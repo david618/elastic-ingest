@@ -3,11 +3,11 @@
 set -e
 
 if [ "$#" -lt 1 ];then
-  echo "Usage: $0 [ResourceGroupName] (sizeGB=1024)"
+  echo "Usage: $0 [ResourceGroupName] (sizeGB=1024) (cloudDrives=no)"
   echo "Example: $0 dj0218"
   echo "Add a 1024GB disk to each AKS node and install Portworx"
-  echo "Example: $0 dj0218 2048"
-  echo "Add a 2048GB disk to each AKS node and install Portworx"
+	echo "Example: $0 dj0218 2048 yes"
+	echo "Create 2048GB disk for each node and install Portworx"
   exit 4
 fi
 
@@ -23,16 +23,22 @@ if [ "$#" -ge 2 ];then
   SIZEGB=$2
 fi
 
+USECLOUDDRIVES=no
+if [ "$#" -ge 3 ];then
+  USECLOUDDRIVES=$3
+fi
+
 . ./support.sh ${RG}
 
-MCRG=$(az aks list --resource-group ${RG} | jq --raw-output '.[0].nodeResourceGroup')
+MCRG=$(az aks list --subscription ${SID} --resource-group ${RG} | jq --raw-output '.[0].nodeResourceGroup')
 
-#NUMNODES=6
 NUMNODES=0
-# Add a disk to each aks node
-for node in $(az vm list -g ${MCRG} | jq --raw-output .[].name | grep aks); do
-  az vm disk attach -g ${MCRG} --vm-name ${node} --name ${node}d1 --new --size-gb ${SIZEGB}
-  echo "Disk ${node}d1 added."  
+# Add a disk to each aks node if USECLOUDDRIVES == no; get the NUMNODES either way
+for node in $(az vm list --subscription ${SID} -g ${MCRG} | jq --raw-output .[].name | grep aks); do
+	if [ "${USECLOUDDRIVES}" == "no" ];then			
+    az vm disk attach --subscription ${SID} -g ${MCRG} --vm-name ${node} --name ${node}d1 --new --size-gb ${SIZEGB}
+    echo "Disk ${node}d1 added."
+	fi	
   NUMNODES=$((${NUMNODES}+1))
 done
 
@@ -51,13 +57,19 @@ FILE=${TenantFolder}/install-portworx.yaml
 
 UUID=$(uuidgen | tr A-Z a-z)
 
-curl -o ${FILE} "https://install.portworx.com/2.1?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key"
+if [ "${USECLOUDDRIVES}" == "no" ];then
+  echo "Using Attached Drives"
+  curl -o ${FILE} "https://install.portworx.com/2.1?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key"
+else
+  echo "Using Cloud Drives"
+       curl -o ${FILE} "https://install.portworx.com/2.1.2-rc2?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key&s=%22type%3DPremium_LRS%2Csize%3D${SIZEGB}%22"
+fi
 
 kubectl --kubeconfig=${KC} apply -f ${FILE}
 
 # Create Service Principal (Required for Portworx 2.1 starting on 18 Jun 2019
 
-RBAC=$(az ad sp create-for-rbac --role="Contributor" -n http://${RG} )
+RBAC=$(az ad sp create-for-rbac --role="Contributor" -n http://${RG} --subscription ${SID})
 APPID=$(echo $RBAC | jq .appId --raw-output)
 APPPW=$(echo $RBAC | jq .password --raw-output)
 TENID=$(echo $RBAC | jq .tenant --raw-output)

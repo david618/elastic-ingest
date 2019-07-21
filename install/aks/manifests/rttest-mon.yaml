@@ -38,7 +38,7 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: rttest-mon
-        image: david62243/rttest-mon:v0.3
+        image: david62243/rttest-mon:20190718
         command:
           - sh
           - -c
