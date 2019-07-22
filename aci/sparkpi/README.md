@@ -28,6 +28,8 @@ sudo docker push david62243/spark:2.4.3
 
 **Note:** This may not be the best security practice.
 
+[default-service-account-rbac.yaml](../../install/aks/manifests/default-service-account-rbac.yaml)
+
 ```
 kubectl apply -f default-service-account-rbac.yaml
 ```
