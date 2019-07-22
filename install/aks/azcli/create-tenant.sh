@@ -82,14 +82,19 @@ if [ "$?" -ne 0 ];then
 	 exit 10
 fi	
 
-log_msg "Installing Portworx; this step can take up to 10 minutes"
-./install-portworx-15.sh ${RG} 1024 ${CLOUDDRIVES} 
-if [ "$?" -ne 0 ];then
-	 update_status "Create Failed" 
-	 exit 15
-fi	
 
-kubectl --kubeconfig=${KC} apply -f ../portworx-storageclasses.yaml
+if [ "${CLOUDDRIVES}" = "yes" || "${CLOUDDRIVES}" = "no" ];then
+  # Not yes or no; then no portworx
+
+  log_msg "Installing Portworx; this step can take up to 10 minutes"
+  ./install-portworx-15.sh ${RG} 1024 ${CLOUDDRIVES} 
+  if [ "$?" -ne 0 ];then
+	   update_status "Create Failed" 
+	   exit 15
+  fi	
+
+  kubectl --kubeconfig=${KC} apply -f ../portworx-storageclasses.yaml
+fi
 
 log_msg "Installing Datastore"
 ./install-datastore-es-25.sh ${RG} ${DEV}

@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "$#" -lt 1 ];then
+if [ "$#" -lt 2 ];then
   echo "Usage: $0 [ResourceGroupName] [Dev=yes/no]"
   exit 4 
 fi
