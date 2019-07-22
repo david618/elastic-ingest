@@ -24,6 +24,21 @@ sudo docker login
 sudo docker push david62243/spark:2.4.3
 ```
 
+### Create Default Service Account RBAC
+
+**Note:** This may not be the best security practice.
+
+```
+kubectl apply -f default-service-account-rbac.yaml
+```
+
+Without you'll get an error when executing Spark jobs.  
+
+```
+forbidden: User "system:serviceaccount:default:default" cannot watch resource "pods" in API group "" in the namespace "default"
+```
+
+
 ### Create Pod
 
 ```
