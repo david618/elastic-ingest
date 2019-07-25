@@ -45,3 +45,9 @@ Observations
 - EKS 1.13
   - 7 node ingest rate was lower (suspect EKS 1.12 7 node rate reported was spuriously high)
   - 10 node ingest was same
+
+
+## Additional Tests 
+
+- Test AKS using Ultra SSD; 7 and 10 es nodes; 14  nodes
+- Enable metrics and try to identify potential performance issues
