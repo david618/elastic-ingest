@@ -8,10 +8,11 @@ kubectl taint nodes aks-nodepool1-12209422-23 key=test:NoSchedule
 
 ### Added Labels to Same Three Nodes
 
-
+```
 kubectl label nodes aks-nodepool1-12209422-21 func=test
 kubectl label nodes aks-nodepool1-12209422-22 func=test
 kubectl label nodes aks-nodepool1-12209422-23 func=test
+```
 
 ### Added NodeSelector and Tolerations 
 
