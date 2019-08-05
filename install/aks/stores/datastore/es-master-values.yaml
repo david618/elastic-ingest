@@ -37,15 +37,15 @@ initResources: {}
   #   cpu: "25m"
   #   memory: "128Mi"
 
-#schedulerName: "stork"
+schedulerName: "stork"
 
 volumeClaimTemplate:
   accessModes: [ "ReadWriteOnce" ]
   #storageClassName: "px-db-rf3-secure-sc"
   #storageClassName: "px-db-rf1-secure-sc"
-  #storageClassName: "px-db-secure-sc"
+  storageClassName: "px-db-rf1-sc"
   #storageClassName: "gp2"
-  storageClassName: "managed-premium"
+  #storageClassName: "managed-premium"
   resources:
     requests:
       storage: 1Gi

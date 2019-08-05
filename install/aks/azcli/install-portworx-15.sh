@@ -3,7 +3,7 @@
 set -e
 
 if [ "$#" -lt 1 ];then
-  echo "Usage: $0 [ResourceGroupName] (sizeGB=1024) (cloudDrives=no)"
+  echo "Usage: $0 [ResourceGroupName] (sizeGB=1024) (cloudDrives=yes)"
   echo "Example: $0 dj0218"
   echo "Add a 1024GB disk to each AKS node and install Portworx"
 	echo "Example: $0 dj0218 2048 yes"
@@ -23,7 +23,7 @@ if [ "$#" -ge 2 ];then
   SIZEGB=$2
 fi
 
-USECLOUDDRIVES=no
+USECLOUDDRIVES=yes
 if [ "$#" -ge 3 ];then
   USECLOUDDRIVES=$3
 fi
@@ -59,10 +59,10 @@ UUID=$(uuidgen | tr A-Z a-z)
 
 if [ "${USECLOUDDRIVES}" == "no" ];then
   echo "Using Attached Drives"
-  curl -o ${FILE} "https://install.portworx.com/2.1?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key"
+  curl -o ${FILE} "https://install.portworx.com/2.1.2?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key"
 else
   echo "Using Cloud Drives"
-       curl -o ${FILE} "https://install.portworx.com/2.1.2-rc2?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key&s=%22type%3DPremium_LRS%2Csize%3D${SIZEGB}%22"
+       curl -o ${FILE} "https://install.portworx.com/2.1.2?mc=false&kbver=$(kubectl --kubeconfig=${KC} version --short | awk -Fv '/Server Version: /{print $3}')&b=true&c=${RG}-${UUID}&aks=true&stork=true&lh=true&st=k8s&cluster_secret_key=cluster-wide-secret-key&s=%22type%3DPremium_LRS%2Csize%3D${SIZEGB}%22"
 fi
 
 kubectl --kubeconfig=${KC} apply -f ${FILE}

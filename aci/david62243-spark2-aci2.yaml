@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: david62243-spark2-aci2
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: david62243-spark2-aci2
+  template:
+    metadata:
+      labels:
+        app: david62243-spark2-aci2
+    spec:
+      containers:
+      - name: david62243-spark2-aci2
+        image: david62243/spark:2.4.3
+        command: ["/bin/ash", "-c"]
+        args: 
+          - |
+            sleep 10; \
+            /opt/spark/bin/spark-submit \
+            --master k8s://https://kubernetes.default.svc.cluster.local:443 \
+            --deploy-mode cluster \
+            --name spark-pi \
+            --class org.apache.spark.examples.SparkPi \
+            --conf spark.kubernetes.node.selector.type=virtual-kubelet \
+            --conf spark.executor.instances=3 \
+            --conf spark.kubernetes.container.image=david62243/spark:2.4.3 \
+            local:///opt/spark/examples/jars/spark-examples_2.11-2.4.3.jar; \
+            tail -f /dev/null
+      nodeSelector:
+        kubernetes.io/role: agent
+        beta.kubernetes.io/os: linux
+        type: virtual-kubelet
+      tolerations:
+      - key: virtual-kubelet.io/provider
+        operator: Exists
+      - key: azure.com/aci
+        effect: NoSchedule

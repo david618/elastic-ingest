@@ -1,25 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rttest-mon-kafka
+  name: rttest-mon-es
 spec:
   selector:
     matchLabels:
-      app: rttest-mon-kafka
+      app: rttest-mon-es
   replicas: 1
   template:
     metadata:
       labels:
-        app: rttest-mon-kafka
+        app: rttest-mon-es
     spec:
       containers:
-      - name: rttest-mon-kafka
+      - name: rttest-mon-es
         image: david62243/rttest-mon:20190730
         command: ["/bin/bash", "-c"]
         imagePullPolicy: Always
         args: 
-          - >
+          - >-
             cd /opt/rttest;
-            java -cp target/rttest.jar com.esri.rttest.mon.KafkaTopicMon gateway-cp-kafka:9092 planes10
+            java -cp target/rttest.jar com.esri.rttest.mon.ElasticIndexMon http://datastore-elasticsearch-client-headless:9200/planes 70
+      tolerations:
+      - key: "key"
+        operator: "Exists"
+        effect: "NoSchedule"
       nodeSelector:
         func: test
+

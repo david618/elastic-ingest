@@ -1,11 +1,11 @@
 #!/bin/bash
 
 if [ "$#" -lt 2 ];then
-	echo "Usage: $0 [ResourceGroupName] (Location=eastus2) (cores-per-node=16) (number-nodes=6) (aks-type=default|advnet|aci) (clouddrives=no)"
+	echo "Usage: $0 [ResourceGroupName] (Location=eastus2) (cores-per-node=16|32) (number-nodes=6) (aks-type=default|advnet|aci) (clouddrives=yes|no|nopx)"
   echo
   echo "Example: $0 dj0219 westus2 16 6 aci yes"
   echo "Create Resource Group dj0219; AKS dj0219-cluster, in westus2, creating 6 nodes; 16 per node; aci enabled; portworx cloud drives"
-  echo
+  echo 
   exit 4 
 fi
 
@@ -49,7 +49,7 @@ if [ "$#" -ge 5 ];then
   AKS_TYPE=$5
 fi
 
-CLOUDDRIVES="no"
+CLOUDDRIVES="yes"
 if [ "$#" -ge 6 ];then
   CLOUDDRIVES=$6
 fi
@@ -69,7 +69,7 @@ log_msg "Creating AKS; this step can take up to 10 minutes"
 if [ "${AKS_TYPE}" ==  "default" ]; then
 	 ./install-aks-10.sh ${RG} ${LOCATION} ${CORES} ${COUNT}
 elif [ "${AKS_TYPE}" ==  "advnet" ]; then
-	 ./install-aks-11.sh ${RG} ${LOCATION} ${CORES} ${COUNT}
+	 ./install-aks-13.sh ${RG} ${LOCATION} ${CORES} ${COUNT}
 elif [ "${AKS_TYPE}" ==  "aci" ]; then
 	 ./install-aks-12.sh ${RG} ${LOCATION} ${CORES} ${COUNT}
 else
@@ -83,7 +83,7 @@ if [ "$?" -ne 0 ];then
 fi	
 
 
-if [ "${CLOUDDRIVES}" = "yes" || "${CLOUDDRIVES}" = "no" ];then
+if [ "${CLOUDDRIVES}" == "yes" ] || [ "${CLOUDDRIVES}" == "no" ];then
   # Not yes or no; then no portworx
 
   log_msg "Installing Portworx; this step can take up to 10 minutes"

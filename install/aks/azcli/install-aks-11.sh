@@ -80,8 +80,6 @@ fi
 echo "Creating Resource Group"
 az group create --name ${RG} --location ${LOCATION}
 
-# Right now hard-coded root disk of 100G and K8S version 1.12.7 
-
 echo "Creating VNET"
 az network vnet create --name ${RG} --resource-group ${RG} --subnet-name default --address-prefix 10.0.0.0/8 --subnet-prefix 10.240.0.0/16  
 
@@ -103,7 +101,7 @@ az aks create \
     --docker-bridge-address 172.17.0.1/16 \
     --dns-service-ip 10.0.0.10 \
     --service-cidr 10.0.0.0/16 \
-    --kubernetes-version 1.12.7 
+    --kubernetes-version 1.13.7 
 echo "It took $(($(date +'%s') - $start)) seconds to create AKS"
 
 echo "Getting AKS Credentials"

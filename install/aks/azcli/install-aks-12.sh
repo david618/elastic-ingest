@@ -112,8 +112,6 @@ VNET=$(az network vnet show --resource-group ${RG} --name ${RG} --query id -o ts
 az role assignment create --assignee ${APPID} --scope ${VNET} --role Contributor
 
 
-# Right now hard-coded root disk of 100G and K8S version 1.12.7 
-
 echo "Creating AKS"
 AKSSUBNET=$(az network vnet subnet show --resource-group ${RG} --vnet-name ${RG} --name ${AKS_SUBNET_NAME} --query id -o tsv)
 
@@ -128,7 +126,7 @@ az aks create \
     --admin-username ${USER} \
     --ssh-key-value ${PUBKEY} \
     --node-osdisk-size 100 \
-    --kubernetes-version 1.12.8 \
+    --kubernetes-version 1.13.7 \
 		--network-plugin azure \
     --service-cidr 10.0.0.0/16 \
     --dns-service-ip 10.0.0.10 \

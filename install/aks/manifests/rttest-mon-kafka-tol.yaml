@@ -21,5 +21,9 @@ spec:
           - >
             cd /opt/rttest;
             java -cp target/rttest.jar com.esri.rttest.mon.KafkaTopicMon gateway-cp-kafka:9092 planes10
+      tolerations:
+      - key: "key"
+        operator: "Exists"
+        effect: "NoSchedule"
       nodeSelector:
         func: test

@@ -20,17 +20,17 @@ cp-zookeeper:
     dataDirSize: 5Gi
     #dataDirStorageClass: "px-db-rf3-secure-sc"
     #dataDirStorageClass: "px-db-rf1-secure-sc"
-    #dataDirStorageClass: "px-db-rf1-sc"
+    dataDirStorageClass: "px-db-rf1-sc"
     #dataDirStorageClass: "gp2"
-    dataDirStorageClass: "managed-premium"
+    #dataDirStorageClass: "managed-premium"
 
     ## Size for data log dir, which is a dedicated log device to be used, and helps avoid competition between logging and snaphots.
     dataLogDirSize: 5Gi
     #dataLogDirStorageClass: "px-db-rf3-secure-sc"
     #dataLogDirStorageClass: "px-db-rf1-secure-sc"
-    #dataLogDirStorageClass: "px-db-rf1-sc"
+    dataLogDirStorageClass: "px-db-rf1-sc"
     #dataLogDirStorageClass: "gp2"
-    dataLogDirStorageClass: "managed-premium"
+    #dataLogDirStorageClass: "managed-premium"
   resources: {}
   ## If you do want to specify resources, uncomment the following lines, adjust them as necessary,
   ## and remove the curly braces after 'resources:'
@@ -40,7 +40,7 @@ cp-zookeeper:
   #  requests:
   #   cpu: 100m
   #   memory: 128Mi
-  #schedulerName: "stork"
+  schedulerName: "stork"
 
 ## ------------------------------------------------------
 ## Kafka
@@ -54,26 +54,28 @@ cp-kafka:
   ## https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
   imagePullSecrets:
   #  - name: "regcred"
-  heapOptions: "-Xms512M -Xmx512M"
+  #heapOptions: "-Xms512M -Xmx512M"
+  heapOptions: "-Xms26G -Xmx26G"
   persistence:
     enabled: true
     #storageClass: "px-db-rf3-secure-sc"
     #storageClass: "px-db-rf1-secure-sc"
-    #storageClass: "px-db-rf1-sc"
+    storageClass: "px-db-rf1-sc"
     #storageClass: "gp2"
-    storageClass: "managed-premium"
+    #storageClass: "managed-premium"
     size: 1Ti
     disksPerBroker: 1
-  resources: {}
+  #resources: {}
   ## If you do want to specify resources, uncomment the following lines, adjust them as necessary,
   ## and remove the curly braces after 'resources:'
+  resources:
   #  limits:
   #   cpu: 100m
   #   memory: 128Mi
-  #  requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-  #schedulerName: "stork"
+    requests:
+     cpu: "14"
+     memory: "50Gi"
+  schedulerName: "stork"
 
 ## ------------------------------------------------------
 ## Schema Registry

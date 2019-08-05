@@ -1,0 +1,52 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rttest-mon
+  labels:
+    app: rttest-mon
+spec:
+  ports:
+  clusterIP: None
+  selector:
+    app: rttest-mon
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rttest-mon
+spec:
+  serviceName: rttest-mon
+  selector:
+    matchLabels:
+      app: rttest-mon
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: rttest-mon
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: kubernetes.io/role
+                operator: In
+                values:
+                - agent
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: rttest-mon
+        image: david62243/rttest-mon:20190718
+        command:
+          - sh
+          - -c
+          - "exec tail -f /dev/null"
+        imagePullPolicy: Always
+      tolerations:
+      - key: "key"
+        operator: "Exists"
+        effect: "NoSchedule"  
+      nodeSelector:
+        func: test

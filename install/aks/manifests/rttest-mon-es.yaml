@@ -14,12 +14,12 @@ spec:
     spec:
       containers:
       - name: rttest-mon-es
-        image: david62243/rttest-mon:v0.3
+        image: david62243/rttest-mon:20190730
         command: ["/bin/bash", "-c"]
         imagePullPolicy: Always
         args: 
           - >-
             cd /opt/rttest;
-            java -cp target/rttest.jar com.esri.rttest.mon.ElasticIndexMon http://datastore-elasticsearch-client-headless:9200/planes 60
+            java -cp target/rttest.jar com.esri.rttest.mon.ElasticIndexMon http://datastore-elasticsearch-client-headless:9200/planes 70
       nodeSelector:
         func: test

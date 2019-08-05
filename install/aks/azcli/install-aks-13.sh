@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Tweaked for ACI install
+
+# Based on Instructions: https://docs.microsoft.com/en-us/azure/aks/virtual-nodes-cli
+
 set -e
 
 if [ "$#" -lt 1 ];then
@@ -19,8 +23,6 @@ if [ $? -ne 0 ];then
   echo 'You need to login first. Run "az login"'
   exit 5 
 fi
-
-# We could use a parameter based on tenant (small, standard, large)
 
 RG=$1
 CLUSTER=${RG}-cluster
@@ -83,11 +85,36 @@ fi
 echo "Creating Resource Group"
 az group create --subscription ${SID} --name ${RG} --location ${LOCATION}
 
-# Right now hard-coded root disk of 100G and K8S version 1.12.7 
+echo "Create Virtual Network"
+
+AKS_SUBNET_NAME=${RG}AksSubnet
+
+az network vnet create \
+    --resource-group ${RG} \
+    --name ${RG} \
+    --address-prefixes 10.0.0.0/8 \
+    --subnet-name ${AKS_SUBNET_NAME} \
+    --subnet-prefix 10.240.0.0/16
+
+echo "Create Node Subnet"
+
+NODE_SUBNET_NAME=${RG}NodeSubnet
+
+az network vnet subnet create \
+    --resource-group ${RG} \
+    --vnet-name ${RG} \
+    --name ${NODE_SUBNET_NAME} \
+    --address-prefixes 10.241.0.0/16
+
+echo "Assign Role"
+
+VNET=$(az network vnet show --resource-group ${RG} --name ${RG} --query id -o tsv)
+az role assignment create --assignee ${APPID} --scope ${VNET} --role Contributor
+
 
 echo "Creating AKS"
+AKSSUBNET=$(az network vnet subnet show --resource-group ${RG} --vnet-name ${RG} --name ${AKS_SUBNET_NAME} --query id -o tsv)
 
-#    --enable-addons monitoring \
 
 start=$(date +'%s')
 az aks create \
@@ -99,8 +126,24 @@ az aks create \
     --admin-username ${USER} \
     --ssh-key-value ${PUBKEY} \
     --node-osdisk-size 100 \
-    --kubernetes-version 1.13.7 
+    --kubernetes-version 1.13.7 \
+		--network-plugin azure \
+    --service-cidr 10.0.0.0/16 \
+    --dns-service-ip 10.0.0.10 \
+    --docker-bridge-address 172.17.0.1/16 \
+    --vnet-subnet-id ${AKSSUBNET} \
+    --service-principal ${APPID} \
+    --client-secret ${APPPW}
 echo "It took $(($(date +'%s') - $start)) seconds to create AKS"
+
+#echo "Enable Virtual Node"
+#
+#az aks enable-addons \
+#    --resource-group ${RG} \
+#    --name ${CLUSTER} \
+#    --addons virtual-node \
+#    --subnet-name ${NODE_SUBNET_NAME}
+
 
 echo "Getting AKS Credentials"
 
