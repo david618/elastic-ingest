@@ -29,7 +29,6 @@ This creates a 24 node cluster using m5.4xlarge (16 cores/64GB mem) and EKS enab
 - Install Elasticsearch 
 - Install Gateway 
 - Install Spark Operator
-```
 
 
 #### Scaled Datastore to 7 Replicas
