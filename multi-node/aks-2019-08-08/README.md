@@ -135,6 +135,9 @@ Azure Managed Premium
 |az2           |252    |2                 |
 |px3           |238    |13                |
 
+
+
+
 We need at least 2 replicas for high availability; ideally we'd have 3 replicas spread across 3 Availability zones. 
 
 Obserations
