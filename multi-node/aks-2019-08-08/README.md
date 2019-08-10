@@ -49,7 +49,7 @@ Used rttest monitor and rttest send to include a selector and tolerance.
 
 ### Run Tests
 
-Used ``run-test-10part.sh``
+Used [run-test-10part.sh](../../install/aks/manifests/run-test-10part.sh)
 
 The script repeats the following steps 25 times
 - Deletes rttest kafka and es monitors; sleeps 10 seconds
@@ -119,7 +119,7 @@ Portworx
 
 Azure Managed Premium 
 - Elasticsearch Number of Replicas 0 and Kafka Replication Factor 1 (**az1**)
-- Elasticsearch Number of Replicas 1 and Kafka Replication Factor 2 (**az2**) (Use: ``run-test-10part-repl2.sh``) 
+- Elasticsearch Number of Replicas 1 and Kafka Replication Factor 2 (**az2**) (Use: [run-test-10part-repl2.sh](../../install/aks/manifests/run-test-10part-repl2.sh)) 
 
 ### Results
 
