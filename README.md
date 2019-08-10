@@ -48,8 +48,9 @@ Observations
 ### Portworx Test Results 
 
 - AKS with 25 D16sv3
-- Taint/Label/Tollerance/Selector used to keep test code seprate
-- Kafka Brokers using 14cpu/50GB mem (keeps Spark Executors off Kafka Broker Node)
+- Elasticsearch (Datastore) with 10 nodes
+- Three Kafka Brokers using 14cpu/50GB mem (keeps Spark Executors off Kafka Broker Nodes)
+- Taint/Label/Tollerance/Selector used to keep test code seprate from what is being tested
 
 #### Test Variations 
 
