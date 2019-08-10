@@ -35,6 +35,16 @@ VM's size
 |10        |466     |289     |170     |466     |282     |347      |385     |
 |20        |938     |        |        |        |        |         |        |
 
+Observations  
+- AKS 1.13
+  - Ingest rates same as AKS 1.12
+- AKS 24
+  - 7 Node ingest rate was close to Az Vms
+  - 10 node ingest dropped (repeated test several times)
+- EKS 1.13
+  - 7 node ingest rate was lower (suspect EKS 1.12 7 node rate reported was spuriously high)
+  - 10 node ingest was same
+
 ### Portworx Test Results 
 
 - AKS with 25 D16sv3
@@ -53,7 +63,10 @@ Portworx
 
 Azure Managed Premium 
 - Elasticsearch Number of Replicas 0 and Kafka Replication Factor 1 (**az1**)
-- Elasticsearch Number of Replicas 1 and Kafka Replication Factor 2 (**az2**) (Use: ``run-test-10part-repl2.sh``) 
+- Elasticsearch Number of Replicas 1 and Kafka Replication Factor 2 (**az2**) 
+- Elasticsearch Number of Replicas 1 and Kafka Replication Factor 3 (**az3**) 
+
+Sorted fastest to slowest (Ingest rates in k/s) using planes data.
 
 |Test Variation|Average|Standard Deviation|
 |--------------|-------|------------------|
@@ -65,23 +78,17 @@ Azure Managed Premium
 |px-es3-k1     |253    |7                 |
 |az2           |252    |2                 |
 |px3           |238    |13                |
+|az3           |214    |4                 |
 
 Oberseravtions
-- az1 rate (404k/s) is best we've seen on AKS; off AKS on Azure (previous table) was 466k/s with similar number of nodes
+- az1 rate (404k/s) is best we've ever seen on AKS; off AKS on Azure was 466k/s using same number of nodes
 - px1 is about the same as az1
 - px2 is 20% slower than px1
 - px3 is 39% slower than px1; 23% slower than px2 
 - az2 is 38% slower than az1
+- az3 is 47% slower than az1; 15% slower than az2
 
-Observations  
-- AKS 1.13
-  - Ingest rates same as AKS 1.12
-- AKS 24
-  - 7 Node ingest rate was close to Az Vms
-  - 10 node ingest dropped (repeated test several times)
-- EKS 1.13
-  - 7 node ingest rate was lower (suspect EKS 1.12 7 node rate reported was spuriously high)
-  - 10 node ingest was same
+
 
 
 ## Additional Tests 
