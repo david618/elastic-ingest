@@ -120,6 +120,8 @@ Portworx
 Azure Managed Premium 
 - Elasticsearch Number of Replicas 0 and Kafka Replication Factor 1 (**az1**)
 - Elasticsearch Number of Replicas 1 and Kafka Replication Factor 2 (**az2**) (Use: [run-test-10part-repl2.sh](../../install/aks/manifests/run-test-10part-repl2.sh)) 
+- Elasticsearch Number of Replicas 1 and Kafka Replication Factor 3 (**az3**) (Use: [run-test-10part-repl3.sh](../../install/aks/manifests/run-test-10part-repl3.sh)) 
+
 
 ### Results
 
@@ -134,6 +136,7 @@ Azure Managed Premium
 |px-es3-k1     |253    |7                 |
 |az2           |252    |2                 |
 |px3           |238    |13                |
+|az3           |214    |4                 |
 
 
 
@@ -143,7 +146,8 @@ We need at least 2 replicas for high availability; ideally we'd have 3 replicas 
 Obserations
 - Highest rates are with one replica; az1 and px1 are about the same
 - Using px replication factor of 1,2,3 on Elasticsearch; while holding Kafka at 1 (391,306,253) wasn't much different than using same Replication Factor for Elasticsearch and Kafka (391,311,238).
-- Azure Premium drives with Elasticsearch and Kafka set to create two copies (252) is about 40k/s slower that px2.   
+- Azure Premium drives with Elasticsearch and Kafka set to create two replicas (252) is about 40k/s slower that px2.
+- Azure 2 (az2) replicas is 37% slower Azure 1 (az1) replica; Azure 3 (az3) replicas is 47% than Azure 1 (az1) replica. 
 
 
 
