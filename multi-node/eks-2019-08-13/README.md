@@ -118,7 +118,7 @@ helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-clie
 ```
 
 ```
-kubectl edit sts zookeepercli-ss
+kubectl edit sts datastore-elasticsearch-client
 ```
 
 Changed replicas from 2 to 10.
