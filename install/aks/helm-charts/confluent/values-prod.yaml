@@ -20,7 +20,9 @@ cp-zookeeper:
     dataDirSize: 5Gi
     #dataDirStorageClass: "px-db-rf3-secure-sc"
     #dataDirStorageClass: "px-db-rf1-secure-sc"
-    dataDirStorageClass: "px-db-rf1-sc"
+    #dataDirStorageClass: "px-db-rf1-sc"
+    #dataDirStorageClass: "px-db-rf2-sc"
+    dataDirStorageClass: "px-db-rf3-dbr-sc"
     #dataDirStorageClass: "gp2"
     #dataDirStorageClass: "managed-premium"
 
@@ -28,7 +30,9 @@ cp-zookeeper:
     dataLogDirSize: 5Gi
     #dataLogDirStorageClass: "px-db-rf3-secure-sc"
     #dataLogDirStorageClass: "px-db-rf1-secure-sc"
-    dataLogDirStorageClass: "px-db-rf1-sc"
+    #dataLogDirStorageClass: "px-db-rf1-sc"
+    #dataLogDirStorageClass: "px-db-rf2-sc"
+    dataLogDirStorageClass: "px-db-rf3-dbr-sc"
     #dataLogDirStorageClass: "gp2"
     #dataLogDirStorageClass: "managed-premium"
   resources: {}
@@ -60,7 +64,9 @@ cp-kafka:
     enabled: true
     #storageClass: "px-db-rf3-secure-sc"
     #storageClass: "px-db-rf1-secure-sc"
-    storageClass: "px-db-rf1-sc"
+    #storageClass: "px-db-rf1-sc"
+    #storageClass: "px-db-rf2-sc"
+    storageClass: "px-db-rf3-dbr-sc"
     #storageClass: "gp2"
     #storageClass: "managed-premium"
     size: 1Ti

@@ -44,6 +44,8 @@ volumeClaimTemplate:
   #storageClassName: "px-db-rf3-secure-sc"
   #storageClassName: "px-db-rf1-secure-sc"
   storageClassName: "px-db-rf1-sc"
+  #storageClassName: "px-db-rf3-dbr-sc"
+  #storageClassName: "px-db-rf2-sc-db-remote"
   #storageClassName: "gp2"
   #storageClassName: "managed-premium"
   resources:

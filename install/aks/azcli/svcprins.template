@@ -10,5 +10,10 @@ export SID="REPLACE WITH YOUR SUBSCRIPTION ID"
 
 #az ad sp create-for-rbac --skip-assignment --name sp-aci
 
+export TENID="INSERT TENANT ID FROM COMMMAND ABOVE HERE"
 export APPID="INSERT APPID FROM COMMAND ABOVE HERE"
 export APPPW="INSERT PASSWORD FROM COMMAND ABOVE HERE"
+
+
+
+# az ad sp list --spn http://sp-aci

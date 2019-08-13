@@ -69,15 +69,18 @@ kubectl --kubeconfig=${KC} apply -f ${FILE}
 
 # Create Service Principal (Required for Portworx 2.1 starting on 18 Jun 2019
 
-RBAC=$(az ad sp create-for-rbac --role="Contributor" -n http://${RG} --subscription ${SID})
-APPID=$(echo $RBAC | jq .appId --raw-output)
-APPPW=$(echo $RBAC | jq .password --raw-output)
-TENID=$(echo $RBAC | jq .tenant --raw-output)
+#RBAC=$(az ad sp create-for-rbac --role="Contributor" -n http://${RG} --subscription ${SID})
+#APPID=$(echo $RBAC | jq .appId --raw-output)
+#APPPW=$(echo $RBAC | jq .password --raw-output)
+#TENID=$(echo $RBAC | jq .tenant --raw-output)
 
+# Use the values from svcprins
 kubectl --kubeconfig=${KC} create secret generic -n kube-system px-azure \
   --from-literal=AZURE_TENANT_ID=${TENID} \
   --from-literal=AZURE_CLIENT_ID=${APPID} \
   --from-literal=AZURE_CLIENT_SECRET=${APPPW}
+
+
 
 
 echo "Waiting for Portworx to Start; this can take another 15  minutes"
