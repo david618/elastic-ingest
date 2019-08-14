@@ -1,0 +1,71 @@
+---
+apiVersion: "sparkoperator.k8s.io/v1beta1"
+kind: SparkApplication
+metadata:
+  name: sparkop-es-2.4.1
+  namespace: default
+spec:
+  arguments:
+    - "k8s://https://kubernetes:443"
+    - "1000"
+    - "gateway-cp-kafka:9092"
+    - "group1"
+    - "planes10"
+    - "1"
+    - "datastore-elasticsearch-client-headless"
+    - "9200"
+    - "-"
+    - "-"
+    - "20"
+    - "true"
+    - "false"
+    - "true"
+    - "planes"
+    - "60s"
+    - "10000"
+    - "2"
+    - "false"
+  driver:
+    coreLimit: "2"
+    cores: 2
+    javaOptions: -Dlog4j.configurationFile=/opt/spark/work-dir/log4j2conf.xml
+    labels:
+      version: 2.4.1
+    memory: 1024m
+    serviceAccount: spark
+  executor:
+    cores: 4
+    instances: 20
+    javaOptions: -Dlog4j.configurationFile=/opt/spark/work-dir/log4j2conf.xml
+    labels:
+      version: 2.4.1
+    memory: 5000m
+  image: "david62243/sparktest:v0.4-2.4.1"
+  imagePullPolicy: Always
+  mainApplicationFile: /opt/spark/work-dir/sparktest-full.jar
+  mainClass: org.jennings.estest.SendKafkaTopicElasticsearch
+  mode: cluster
+  restartPolicy:
+    type: Always 
+  sparkConf:
+    spark.driver.extraClassPath: "/opt/spark/work-dir/dependency-jars/\\*"
+    spark.executor.extraClassPath: "/opt/spark/work-dir/dependency-jars/\\*"
+    spark.kubernetes.container.forcePullImage: "true"
+    spark.kubernetes.container.image: david62243/sparktest:v0.4-2.4.1
+    spark.kubernetes.container.image.pullPolicy: Always
+    spark.kubernetes.driver.label.app: kafka-to-elasticsearch
+    spark.kubernetes.executor.label.app: kafka-to-elasticsearch
+    spark.locality.wait: 60s
+    spark.scheduler.mode: FAIR
+    spark.streaming.concurrentJobs: "64"
+    spark.ui.enabled: "false"
+    spark.ui.showConsoleProgress: "false"
+    spark.streaming.kafka.consumer.cache.enabled: "false"
+    spark.es.batch.size.bytes: "421000000"
+    spark.es.batch.size.entries: "50000"
+    spark.es.batch.write.refresh: "false"
+    spark.es.nodes.discovery: "false"
+    spark.es.nodes.data.only: "false"
+    spark.es.nodes.wan.only: "true"
+  sparkVersion: "2.4.1"
+  type: Scala

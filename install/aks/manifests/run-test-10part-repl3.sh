@@ -2,7 +2,7 @@
 
 topic="planes10"
 
-for runnum in {1..12}; do
+for runnum in {1..25}; do
 	echo "------------------------------------------------------"
 	echo ${runnum}
 
@@ -13,7 +13,7 @@ for runnum in {1..12}; do
 
 	# Stop Send and Spark Job
 	kubectl delete -f rttest-send-kafka-25k-10m-10part-tol.yaml
-	kubectl delete -f sparkop-es-2.4.1-10part.yaml
+	kubectl delete -f sparkop-es-2.4.1-10part-repl2.yaml
   sleep 60 # Wait a min
 
   # Recreate Kafka Topic
@@ -26,23 +26,15 @@ for runnum in {1..12}; do
   fi
 
   # Create Topic
-  kubectl exec gateway-cp-kafka-0 --container cp-kafka-broker -- kafka-topics --zookeeper gateway-cp-zookeeper:2181 --topic ${topic} --create --replication-factor 1 --partitions 10
+  kubectl exec gateway-cp-kafka-0 --container cp-kafka-broker -- kafka-topics --zookeeper gateway-cp-zookeeper:2181 --topic ${topic} --create --replication-factor 3 --partitions 10
 
   if [ "$?" -ne 0 ]; then
-    echo "Create Topic Failed; waiting one minute and try again."
-    sleep 60
-    # Try one more time
-
-    kubectl exec gateway-cp-kafka-0 --container cp-kafka-broker -- kafka-topics --zookeeper gateway-cp-zookeeper:2181 --topic ${topic} --create --replication-factor 1 --partitions 10
-
-    if [ "$?" -ne 0 ]; then
-      echo "Create Topic Failed; this will happen if some process has an open connection to the topic. Make sure you delete all producers/consumers and run script again"
-      exit 1
-    fi
+    echo "Create Topic Failed; this will happen if some process has an open connection to the topic. Make sure you delete all producers/consumers and try again."
+    exit 1
   fi  
 
-	# Start Spark Job
-  kubectl apply -f sparkop-es-2.4.1-10part.yaml
+	# Start Spark Job (Elasticsearch changed to Repl 1 instead of Repl 0)
+  kubectl apply -f sparkop-es-2.4.1-10part-repl2.yaml
 	sleep 60 # Wait a min
 	
 	# Start monitors
