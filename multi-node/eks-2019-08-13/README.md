@@ -147,3 +147,103 @@ From aks/manifests folder.
 ```
 bash run-test-10part.sh > dj0813-px3-dbr-08131109.log &
 ```
+
+
+Collect results. 
+
+The log file output's the logs for es and kafka mon.  From Elasticsearch Logs use the "Rate from First" value that is second from last.  The last line will be inaccurate; because the sample was taken after the send had terminated.  
+
+
+#### Reset for Another Test
+
+##### Remove Test Apps
+```
+kubectl delete -f sparkop-es-2.4.1-10part.yaml
+kubectl delete -f rttest-send-kafka-25k-10m-10part.yaml
+kubectl delete -f rttest-mon-es-tol.yaml
+kubectl delete -f rttest-mon-kafka-tol.yaml
+```
+
+##### Remove Datastore
+
+```
+helm delete --purge datastore-elasticsearch-client
+helm delete --purge datastore-elasticsearch-master
+kubectl delete pvc -l app=datastore-elasticsearch-client
+kubectl delete pvc -l app=datastore-elasticsearch-master
+```
+
+##### Remove Gateway
+
+```
+helm delete --purge gateway
+kubectl delete pvc -l app=cp-kafka
+kubectl delete pvc -l app=cp-zookeeper
+```
+
+#### Edit Configs
+
+Edit values (e.g. Change to px-db-rf2-dbr-sc)
+
+```
+vi ../helm-charts/confluent/values-prod.yaml
+vi ../stores/datastore/es-client-values.yaml
+vi ../stores/datastore/es-master-values.yaml
+```
+
+#### Reinstall and Start Test
+
+- Install Datastore
+- Scale Datastore (2 to 10)
+- Install Gateway 
+- Start Test
+
+```
+bash run-test-10part.sh > dj0813-px2-dbr-08131445.log &
+```
+
+Collect results.
+
+
+#### gp2 Test
+
+```
+bash run-test-10part-600k.sh > dj0813-gp2-08131834.log &
+```
+
+The sender was changed to use 20 instances at 30k for total send of 600k/s.  I suspect 500k will be close to ingest rate achieved.
+
+#### Results
+
+
+Ran 12 interations of each test.
+
+- gp2    : Google's default Storage Class
+- px2-dbr: Portworx Replication Factor 2 with io-profile set to db_remote
+- px3-dbr: Portworx Replication Factor 3 with io-profile set to db_remote
+
+ 
+|Test Case|Average|Standard Deviation|
+|---------|-------|------------------|
+|gp2      |544    |2                 |
+|px2-dbr  |404    |11                |
+|px3-dbr  |351    |26                |
+
+Observations
+- The standard deviation for px3-dbr was more than two times higher than px2-dbr
+- Highest gp2 test results achieved so far (previous highest 466k/s); this test isolated test apps and used larger Kafka brokers
+
+
+#### Delete
+
+```
+eksctl get cluster -r us-east-2
+NAME	REGION
+dj0813	us-east-2
+```
+
+```
+eksctl delete cluster dj0813 -r us-east-2
+```
+
+
