@@ -12,87 +12,58 @@ Test Overview
 
 ## Summary of Test Results
 
-
 VM's size
 - Azure: D16s_v3
 - AWS: M5.4xlarge
 
-### Azure Tests
-- **Az Vms**: 24 VM's (10 Elasticsearch, 10 Spark, 3 Kafka, 1 Test)
-- **AKS 1.12**: 14 VM's, k8s 1.12; Advanced Networking; Premium Drives
-- **AKS Px**: 14 VM's, k8s 1.12, Portworx (replication factor 3; encrypted)
-- **EKS 1.12**: 14 VM's, k8s 1.12, Storage Class: gp2
-- **AKS 1.13**: 14 VM's, k8s 1.13; Advanced Networking; Premium Drives
-- **AKS 24**: 24 VM's, k8s 1.13; Advanced Networking; Premium Drives
-- **EKS 1.13**: 24 VM's, k8s 1.13; Storage Class: gp2
+### Test Results 10 Node Elasticsearch
 
-|# es Nodes|Az Vms  |AKS 1.12|AKS Px  |EKS 1.12|AKS 1.13|AKS 24   |EKS 1.13|
-|----------|--------|--------|--------|--------|--------|---------|--------|
-|1         |83      |        |        |        |        |         |        |
-|3         |223     |161     |        |180     |        |         |        |
-|5         |248     |236     |102     |265     |        |         |        |
-|7         |348     |259     |133     |415     |246     |281      |359     |
-|10        |466     |289     |170     |466     |282     |347      |385     |
-|20        |938     |        |        |        |        |         |        |
-
-Observations  
-- AKS 1.13
-  - Ingest rates same as AKS 1.12
-- AKS 24
-  - 7 Node ingest rate was close to Az Vms
-  - 10 node ingest dropped (repeated test several times)
-- EKS 1.13
-  - 7 node ingest rate was lower (suspect EKS 1.12 7 node rate reported was spuriously high)
-  - 10 node ingest was same
-
-### Portworx Test Results 
-
-- AKS with 25 D16sv3
+- AKS with 25 D16sv3 or EKS with 25 M5.4xlarge (16 cores and 64GB mem)
 - Elasticsearch (Datastore) with 10 nodes
 - Three Kafka Brokers using 14cpu/50GB mem (keeps Spark Executors off Kafka Broker Nodes)
 - Taint/Label/Tollerance/Selector used to keep test code seprate from what is being tested
 
 #### Test Variations 
 
-Portworx
-- Elasticsearch Replication Factor 1 and Kafka Replication Factor 1 (**px1**)
-- Elasticsearch Replication Factor 2 and Kafka Replication Factor 2 (**px2**)
-- Elasticsearch Replication Factor 3 and Kafka Replication Factor 3 (**px3**)
-- Elasticsearch Replication Factor 2 and Kafka Replication Factor 1 (**px-es2-k1**)
-- Elasticsearch Replication Factor 2 (io_profile=db_remote) and Kafka Replication Factor 1 (**px-es2r-k1**)
-- Elasticsearch Replication Factor 3 and Kafka Replication Factor 1 (**px-es3-k1**)
+- **px1**: Elasticsearch Replication Factor 1 and Kafka Replication Factor 1
+- **px2**: Elasticsearch Replication Factor 2 and Kafka Replication Factor 2 
+- **px3**: Elasticsearch Replication Factor 3 and Kafka Replication Factor 3 
+- **px-es2-k1**: Elasticsearch Replication Factor 2 and Kafka Replication Factor 1 
+- **px-es3-k1**: Elasticsearch Replication Factor 3 and Kafka Replication Factor 1 
+- **px-es1-k3**: Elasticsearch Replication Factor 1 and Kafka Replication Factor 3 
+- **px-es2r-k1** Elasticsearch Replication Factor 2 (io_profile=db_remote) and Kafka Replication Factor 1
+- **px-rf2-dbr**: Elasticsearch Replication Factor 2 (io_profile=db_remote)
+- **px-rf3-dbr** Elasticsearch Replication Factor 3 (io_profile=db_remote)
+- **az1**: Elasticsearch Number of Replicas 0 and Kafka Replication Factor 1
+- **az2**: Elasticsearch Number of Replicas 1 and Kafka Replication Factor 2 
+- **az3**: Elasticsearch Number of Replicas 1 and Kafka Replication Factor 3 
+- **gp2**: Google (gp2) default storage class on eks
+- **epx-rf2-dbr**: Elasticsearch Replication Factor 2 (io_profile=db_remote)
+- **epx-rf3-dbr** Elasticsearch Replication Factor 3 (io_profile=db_remote)
 
-Azure Managed Premium 
-- Elasticsearch Number of Replicas 0 and Kafka Replication Factor 1 (**az1**)
-- Elasticsearch Number of Replicas 1 and Kafka Replication Factor 2 (**az2**) 
-- Elasticsearch Number of Replicas 1 and Kafka Replication Factor 3 (**az3**) 
+Orderd fastest to slowest (Ingest rates in k/s).
 
-Sorted fastest to slowest (Ingest rates in k/s) using planes data.
+|Test Variation    |platform|Average|Standard Deviation|High Availability|
+|------------------|--------|-------|------------------|-----------------|
+|**gp2**           |EKS     |545    |2                 |none             |
+|**az1**           |AKS     |404    |9                 |none             |
+|**epx-rf2-dbr**   |EKS     |404    |11                |1                |
+|**px1**           |AKS     |391    |6                 |none             |
+|**epx-rf3-dbr**   |EKS     |351    |26                |2                |
+|**px-es2r-k1**    |AKS     |337    |4                 |none             |
+|**px-rf2-dbr**    |AKS     |324    |11                |1                |
+|**px-es1-k3**     |AKS     |324    |13                |none             |
+|**px2**           |AKS     |311    |11                |1                |
+|**px-es2-k1**     |AKS     |306    |14                |none             |
+|**px-rf3-dbr**    |AKS     |263    |7                 |2                |
+|**px-es3-k1**     |AKS     |253    |7                 |none             |
+|**az2**           |AKS     |252    |2                 |1                |
+|**px3**           |AKS     |238    |13                |2                |
+|**az3**           |AKS     |214    |4                 |2                |
 
-|Test Variation|Average|Standard Deviation|
-|--------------|-------|------------------|
-|az1           |404    |9                 |
-|px1           |391    |6                 |
-|px-es2r-k1    |337    |4                 |
-|px2           |311    |11                |
-|px-es2-k1     |306    |14                |
-|px-es3-k1     |253    |7                 |
-|az2           |252    |2                 |
-|px3           |238    |13                |
-|az3           |214    |4                 |
-
-Oberseravtions
-- az1 rate (404k/s) is best we've ever seen on AKS; off AKS on Azure was 466k/s using same number of nodes
-- px1 is about the same as az1
-- px2 is 20% slower than px1
-- px3 is 39% slower than px1; 23% slower than px2 
-- az2 is 38% slower than az1
-- az3 is 47% slower than az1; 15% slower than az2
+High Availability
+- None: Provide no fault tolerance
+- 1: Can withstand one failed node 
+- 2: Can withstand two failed nodes 
 
 
-
-
-## Additional Tests 
-
-- Test AKS using Ultra SSD; 7 and 10 es nodes; 14  nodes
-- Enable metrics and try to identify potential performance issues
