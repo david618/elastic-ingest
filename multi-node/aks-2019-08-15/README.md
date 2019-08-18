@@ -187,24 +187,26 @@ bash run-test-10part.sh > dj815-azmp-px2-dbr-08161645.log &
 
 Ran 12 interations of each test.
 
-- gp2: EKS gpt Storage Class (no Portworx)
-- gp2-rf2: EKS gpt (Kafka/Elasticsearch Replication Factor 2)
-- gp2-px1: EKS Portworx Replication Factor 1
-- gp2-px2: EKS Portworx Replication Factor 2
-- gp2-px3: EKS Portworx Replication Factor 3
-- gp2-px2-dbr: EKS Portworx Replication Factor 2; io_profile=db_remote
-- gp2-px3-dbr: EKS Portworx Replication Factor 3; io_profile=db_remote
+
+- azmp: Azure Managed Premium (no Portworx)
+- azmp-rf2: Azure Managed Premium (Kafka/Elasticsearch Replication Factor 2)
+- azmp-px1: AKS Portworx Replication Factor 1
+- azmp-px2: AKS Portworx Replication Factor 2
+- azmp-px3: AKS Portworx Replication Factor 3
+- azmp-px2-dbr: AKS Portworx Replication Factor 2; io_profile=db_remote
+- azmp-px3-dbr: AKS Portworx Replication Factor 3; io_profile=db_remote
 
 
 |Test Case   |Average|Standard Deviation|
 |------------|-------|------------------|
-|gp2         |132    |3.0               |
-|gp2-rf2     |68     |2.0               |
-|gp2-px1     |127    |3.9               |
-|gp2-px2     |124    |1.9               |
-|gp2-px3     |106    |3.8               |
-|gp2-px2-dbr |130     |3.0               |
-|gp2-px3-dbr |114     |2.8               |
+|azmp        |95     |2.2               |
+|azmp-rf2    |48     |1.5               |
+|azmp-px1    |99     |1.5               |
+|azmp-px2    |83     |2.5               |
+|azmp-px3    |68     |1.2               |
+|azmp-px2-dbr|97     |2.0               |
+|azmp-px3-dbr|77     |1.5               |
+
 
 #### Delete
 
