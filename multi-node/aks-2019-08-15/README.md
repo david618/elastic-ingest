@@ -69,7 +69,7 @@ kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount
 #### Install Elasticsearch 
 
 
-Comment out schedulerName "stork" and storageClassName to "gp2"
+Comment out schedulerName "stork" and storageClassName to "managed-premium"
 
 Set Resource request for Kafka Broker: 7 cpu and 26Gi memory; Set heapOptions "-Xms13G -Xmx13G" for data nodes (es-client-values).
 
@@ -85,12 +85,12 @@ helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-clie
 
 #### Install Gateway 
 
-Comment out schedulerName "stork" and storageClassName to "gp2"
+Comment out schedulerName "stork" and storageClassName to "managed-premium"
 
 For Brokers:
-- Resource requests and limit for Kafka Broker: 5 cpu 
-- Resource requests 18Gi memory
-- heapOptions "-Xms9G -Xmx9G"
+- Resource requests and limit for Kafka Broker: 2 cpu 
+- Resource requests 4Gi memory
+- heapOptions "-Xms2G -Xmx2G"
 
 **Note:** Tried to set broker's to two; however, cp-kafka-connect expects 3 and would require adjustments to run on 2.
 
