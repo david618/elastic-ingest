@@ -6,15 +6,6 @@ for runnum in {1..12}; do
 	echo "------------------------------------------------------"
 	echo ${runnum}
 
-	# Stop Monitors
-	kubectl delete -f rttest-mon-kafka-tol.yaml
-  kubectl delete -f rttest-mon-es-tol.yaml
-  sleep 10
-
-	# Stop Send and Spark Job
-	kubectl delete -f rttest-send-kafka-30k-10m-10part-tol.yaml
-	kubectl delete -f sparkop-es-2.4.1-10part.yaml
-  sleep 60 # Wait a min
 
   # Recreate Kafka Topic
   # If it exists; delete it
@@ -52,5 +43,15 @@ for runnum in {1..12}; do
 	echo "Elasticsearch Logs"
 	kubectl logs $(kubectl get pod -l app=rttest-mon-es -o name)
 	sleep 10
+
+	# Stop Monitors
+	kubectl delete -f rttest-mon-kafka-tol.yaml
+  kubectl delete -f rttest-mon-es-tol.yaml
+  sleep 10
+
+	# Stop Send and Spark Job
+	kubectl delete -f rttest-send-kafka-30k-10m-10part-tol.yaml
+	kubectl delete -f sparkop-es-2.4.1-10part.yaml
+  sleep 60 # Wait a min
 
 done

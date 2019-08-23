@@ -1,6 +1,8 @@
 *.swp
 *.log
 
+.idea/*
+
 install/aks/azcli/tenants/*
 
 install/aks/azcli/svcprins

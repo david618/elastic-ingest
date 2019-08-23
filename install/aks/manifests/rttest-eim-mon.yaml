@@ -2,29 +2,29 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: rttest-mon
+  name: rttest-eim-mon
   labels:
-    app: rttest-mon
+    app: rttest-eim-mon
 spec:
   ports:
   clusterIP: None
   selector:
-    app: rttest-mon
+    app: rttest-eim-mon
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: rttest-mon
+  name: rttest-eim-mon
 spec:
-  serviceName: rttest-mon
+  serviceName: rttest-eim-mon
   selector:
     matchLabels:
-      app: rttest-mon
+      app: rttest-eim-mon
   replicas: 1
   template:
     metadata:
       labels:
-        app: rttest-mon
+        app: rttest-eim-mon
     spec:
       affinity:
         podAntiAffinity:
@@ -39,10 +39,11 @@ spec:
       containers:
       - name: rttest-mon
         image: david62243/rttest-mon:20190718
-        command:
-          - sh
-          - -c
-          - "exec tail -f /dev/null"
+        command: ["/bin/bash", "-c"]
+        args:
+          - >-
+            cd /opt/rttest;
+            java -cp target/rttest.jar com.esri.rttest.mon.ElasticIndexMon http://datastore-elasticsearch-client-headless:9200/planes 20 4 
         imagePullPolicy: Always
       tolerations:
       - key: "key"

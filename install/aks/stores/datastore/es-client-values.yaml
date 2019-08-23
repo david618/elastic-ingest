@@ -19,15 +19,15 @@ imageTag: "7.0.0"
 imagePullPolicy: "Always"
 #imagePullPolicy: "IfNotPresent"
 
-esJavaOpts: "-Xmx26g -Xms26g"
+esJavaOpts: "-Xmx13g -Xms13g"
 
 resources:
   requests:
-    cpu: "14"
-    memory: "50Gi"
+    cpu: "7"
+    memory: "26Gi"
   limits:
-    cpu: "14"
-    memory: "50Gi"
+    cpu: "7"
+    memory: "26Gi"
 
 initResources: {}
   # limits:
@@ -37,18 +37,18 @@ initResources: {}
   #   cpu: "25m"
   #   memory: "128Mi"
 
-#schedulerName: "stork"
+schedulerName: "stork"
 
 volumeClaimTemplate:
   accessModes: [ "ReadWriteOnce" ]
   #storageClassName: "px-db-rf3-secure-sc"
   #storageClassName: "px-db-rf1-secure-sc"
-  #storageClassName: "px-db-rf1-sc"
+  #storageClassName: "px-db-rf1-es-data-sc"
   #storageClassName: "px-db-rf3-dbr-sc"
   #storageClassName: "px-db-rf2-sc-db-remote"
-  #storageClassName: "px-db-rf1-sc"
+  storageClassName: "px-db-rf3-dbr-sc"
   #storageClassName: "gp2"
-  storageClassName: "managed-premium"
+  #storageClassName: "managed-premium"
   resources:
     requests:
       storage: 1Ti

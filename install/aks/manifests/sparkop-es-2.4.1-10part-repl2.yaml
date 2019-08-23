@@ -35,7 +35,7 @@ spec:
     serviceAccount: spark
   executor:
     cores: 4
-    instances: 20
+    instances: 10
     javaOptions: -Dlog4j.configurationFile=/opt/spark/work-dir/log4j2conf.xml
     labels:
       version: 2.4.1

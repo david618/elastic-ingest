@@ -101,7 +101,7 @@ az aks create \
     --docker-bridge-address 172.17.0.1/16 \
     --dns-service-ip 10.0.0.10 \
     --service-cidr 10.0.0.0/16 \
-    --kubernetes-version 1.13.7 
+    --kubernetes-version 1.13.9 
 echo "It took $(($(date +'%s') - $start)) seconds to create AKS"
 
 echo "Getting AKS Credentials"

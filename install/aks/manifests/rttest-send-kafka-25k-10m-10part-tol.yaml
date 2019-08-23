@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: rttest-send-kafka-25k-10m
-  replicas: 20 
+  replicas: 10 
   template:
     metadata:
       labels:

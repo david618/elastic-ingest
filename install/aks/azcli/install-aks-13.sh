@@ -126,7 +126,7 @@ az aks create \
     --admin-username ${USER} \
     --ssh-key-value ${PUBKEY} \
     --node-osdisk-size 100 \
-    --kubernetes-version 1.13.7 \
+    --kubernetes-version 1.13.9 \
 		--network-plugin azure \
     --service-cidr 10.0.0.0/16 \
     --dns-service-ip 10.0.0.10 \

@@ -2,7 +2,7 @@
 
 topic="planes10"
 
-for runnum in {1..12}; do
+for runnum in {1..25}; do
 	echo "------------------------------------------------------"
 	echo ${runnum}
 

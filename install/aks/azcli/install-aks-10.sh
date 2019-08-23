@@ -83,8 +83,6 @@ fi
 echo "Creating Resource Group"
 az group create --subscription ${SID} --name ${RG} --location ${LOCATION}
 
-# Right now hard-coded root disk of 100G and K8S version 1.12.7 
-
 echo "Creating AKS"
 
 #    --enable-addons monitoring \
@@ -99,7 +97,7 @@ az aks create \
     --admin-username ${USER} \
     --ssh-key-value ${PUBKEY} \
     --node-osdisk-size 100 \
-    --kubernetes-version 1.13.7 
+    --kubernetes-version 1.13.9 
 echo "It took $(($(date +'%s') - $start)) seconds to create AKS"
 
 echo "Getting AKS Credentials"
