@@ -20,7 +20,7 @@ VM's size
 
 - 6 D16sv3 or M5.4xlarge nodes (16 cores/64 GB mem)
 - 1 Node tainted and used as test server
-- 2 Elasticsearch Client nodes (7 cpu, 18GB mem each)
+- 2 Elasticsearch Client nodes (7 cpu, 26GB mem each)
 - 3 Brokers (2 cpu, 4GB mem each)
 - 10 Spark Executors
 - 10 Senders (Each sending 25k/s for 10 million)
