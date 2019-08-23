@@ -32,10 +32,10 @@ Shows 5TB.
 
 Comment out schedulerName "stork" and storageClassName to "managed-premium"
 
-For Brokers:
-- Resource requests and limit for Kafka Broker: 5 cpu 
-- Resource requests 18Gi memory
-- heapOptions "-Xms9G -Xmx9G"
+For Data Nodes:
+- Resource requests and limit: 7 cpu 
+- Resource requests 26Gi memory
+- heapOptions "-Xms13G -Xmx13G"
 
 From aks/azcli folder of repo.
 
@@ -49,9 +49,9 @@ helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-clie
 
 Comment out schedulerName "stork" and storageClassName to "managed-premium"
 
-Set Resource request for Kafka Broker: 7 cpu and 26Gi memory; Set heapOptions "-Xms13G -Xmx13G"
+Set Resource request for Kafka Broker: 5 cpu and 18Gi memory; Set heapOptions "-Xms9G -Xmx9G"
 
-Set number of brokers to 2.
+Set number of brokers to 3.
 
 ```
 helm upgrade --wait --timeout=600 --install --values ../helm-charts/confluent/values-prod.yaml gateway ../helm-charts/confluent
