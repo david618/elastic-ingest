@@ -31,7 +31,7 @@ Shows 5TB.
 
 
 
-Comment out schedulerName "stork" and storageClassName to "gp2"
+Comment out schedulerName "stork" and storageClassName to "managed-premium"
 
 Set Resource request for Kafka Broker: 7 cpu and 26Gi memory; Set heapOptions "-Xms13G -Xmx13G" for data nodes (es-client-values).
 
@@ -47,7 +47,7 @@ helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-clie
 
 #### Install Gateway 
 
-Comment out schedulerName "stork" and storageClassName to "gp2"
+Comment out schedulerName "stork" and storageClassName to "managed-premium"
 
 For Brokers:
 - Resource requests and limit for Kafka Broker: 2 cpu 
@@ -68,46 +68,6 @@ kubectl create serviceaccount spark
 kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
 ```
 
-#### Install Elasticsearch 
-
-
-Comment out schedulerName "stork" and storageClassName to "gp2"
-
-Set Resource request for Kafka Broker: 7 cpu and 26Gi memory; Set heapOptions "-Xms13G -Xmx13G" for data nodes (es-client-values).
-
-
-From aks/azcli folder of repo.
-
-```
-helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-master-values.yaml datastore-elasticsearch-master ../helm-charts/elastic/elasticsearch
-helm upgrade --wait --timeout=600 --install --values ../stores/datastore/es-client-values.yaml datastore-elasticsearch-client ../helm-charts/elastic/elasticsearch
-
-```
-
-
-#### Install Gateway 
-
-Comment out schedulerName "stork" and storageClassName to "gp2"
-
-For Brokers:
-- Resource requests and limit for Kafka Broker: 5 cpu 
-- Resource requests 18Gi memory
-- heapOptions "-Xms9G -Xmx9G"
-
-**Note:** Tried to set broker's to two; however, cp-kafka-connect expects 3 and would require adjustments to run on 2.
-
-```
-helm upgrade --wait --timeout=600 --install --values ../helm-charts/confluent/values-prod.yaml gateway ../helm-charts/confluent
-```
-
-#### Install Spark Operator
-
-```
-helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
-helm install incubator/sparkoperator --name spark --namespace spark-operator --set enableWebhook=true
-kubectl create serviceaccount spark
-kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:spark --namespace=default
-```
 
 ### Sparkop Job
 
@@ -212,7 +172,6 @@ Ran 12 interations of each test.
 
 #### Delete
 
-Remove Role from IAM added for portworx.
 
 ```
 ./delete_tenant.sh dj0815a
